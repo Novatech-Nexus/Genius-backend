@@ -4,8 +4,22 @@
 import mongoose from "mongoose";
 
 export const UserSchema = new mongoose.Schema({
-    username: {
+    profile: {},
+    firstname: {},
+    lastname: {},
+    email: {
+        type: String,
+        required: [true, "Please provide an unique email"],
+        unique: true,
+    },
+    phoneNumber: {
+        type: Number,
+    },
+    password: {
         type : String,
-        required: true,
-    }
+        required: [true, "Please provide a password"],
+        unique: false,
+    },
 }) 
+
+export default mongoose.model.Users || mongoose.model('User', UserSchema)
