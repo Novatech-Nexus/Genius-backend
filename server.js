@@ -4,6 +4,7 @@ import morgan from 'morgan'; //is used to log all the http requests inside the c
 import connect from './database/connection.js';
 import router from './router/route.js';
 
+
 const app= express();
 
 // middlewares
