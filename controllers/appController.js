@@ -1,6 +1,25 @@
 import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import ENV from '../config.js';
 
+/**Middleware for verify user*/
+export async function verifyUser(req, res, next){
+  try {
+      const { email } = req.method == "GET" ? req.query : req.body;
+
+      //Check the user existance
+      let exist = await UserModel.findOne({ email});
+      if(!exist) return res.status(404).send({ error: "Cannot find the email "});
+      next(); 
+
+  } catch (error) {
+      return res.status(404).send({ error: "Authentication error "})
+  }
+}
+
+
+// Register function
 export async function register(req, res) {
   try {
     const { profile, firstname, lastname, email, phoneNumber, password } = req.body;
@@ -35,9 +54,25 @@ export async function register(req, res) {
   }
 }
 
+// Login function
+// User kiyalamai variable ekak haduwe methana: "const user = await UserModel.findOne({ email });"
+export async function login(req, res) {
+  const { email, password } = req.body;
 
-export async function login(req, res){
-    res.json('login route');
+  try {
+    const user = await UserModel.findOne({ email });
+
+    if (!user) return res.status(404).send({ error: "Email not found" });
+
+    const passwordCheck = await bcrypt.compare(password, user.password);
+    if (!passwordCheck) return res.status(400).send({ error: "Password incorrect" });
+
+    // Create JWT token
+    const token = jwt.sign({ userId: user._id, email: user.email }, ENV.JWT_SECRET, { expiresIn: "24h" });
+    return res.status(200).send({ msg: "Login successful", email: user.email, token });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
 }
 
 
