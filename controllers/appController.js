@@ -3,6 +3,21 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import ENV from '../config.js';
 
+/**Middleware for verify user*/
+export async function verifyUser(req, res, next){
+  try {
+      const { email } = req.method == "GET" ? req.query : req.body;
+
+      //Check the user existance
+      let exist = await UserModel.findOne({ email});
+      if(!exist) return res.status(404).send({ error: "Cannot find the email "});
+      next(); 
+
+  } catch (error) {
+      return res.status(404).send({ error: "Authentication error "})
+  }
+}
+
 
 // Register function
 export async function register(req, res) {
