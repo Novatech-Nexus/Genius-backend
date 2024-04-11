@@ -76,9 +76,27 @@ export async function login(req, res) {
 }
 
 
-export async function getUser(req, res){
-    res.json('getUser route');
+// Get user function
+export async function getUser(req, res) {
+  const { email } = req.params;
+
+  try {
+    if (!email) return res.status(501).send({ error: "Email not found" });
+
+    // Use await to wait for the findOne operation to complete
+    const user = await UserModel.findOne({ email });
+
+    if (!user) return res.status(401).send({ error: "User not found" });
+
+    // remove unnecessary data from the response with an object converting it to JSON
+    const { password, ...rest } = Object.assign({}, user.toJSON());
+
+    return res.status(200).send(rest);
+  } catch (error) {
+    res.status(500).send({ error });
+  }
 }
+
 
 
 export async function updateUser(req, res){
