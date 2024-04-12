@@ -15,4 +15,16 @@ export const addFeedback = async (req, res, next) => {
     } catch (error) {
       next(error); // Forwarding error to error handling middleware
     }
-  };
+};
+
+
+// Get all feedback
+export const getFeedback = async (req, res, next) => {
+  try {
+    // Fetching all feedback data
+    const feedbackData = await feedback.find();
+    res.status(200).json(feedbackData);  // Sending feedback data as response
+  } catch (error) {
+    next(error);
+  }
+};
