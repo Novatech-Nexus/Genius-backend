@@ -46,3 +46,25 @@ export const deleteFeedback = async (req, res, next) => {
     next(error);
   }
 };
+
+
+// Update feedback by ID
+export const updateFeedback = async (req, res, next) => {
+
+  // Extracting feedback ID from request parameters
+  const { id } = req.params;
+
+  // Destructuring updated data from request body
+  const { name, email, rating, message } = req.body;
+  try {
+    // Finding and updating feedback by ID
+    const updatedFeedback = await feedback.findByIdAndUpdate(id, { name, email, rating, message }, { new: true });
+    if (!updatedFeedback) {
+      return res.status(404).json({ success: false, message: 'Feedback not found.' });
+    }
+    // Sending success response with updated feedback data
+    res.status(200).json({ success: true, message: 'Feedback updated successfully.', feedback: updatedFeedback });
+  } catch (error) {
+    next(error);
+  }
+};
