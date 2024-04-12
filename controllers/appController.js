@@ -98,10 +98,33 @@ export async function getUser(req, res) {
 }
 
 
+export async function updateUser(req, res) {
+  try {
+    const { id } = req.params; // Use params for specific user update
 
-export async function updateUser(req, res){
-    res.json('updateUser route');
+    if (!id) {
+      return res.status(400).send({ error: "Missing user ID in request parameters" });
+    }
+
+    const updateData = req.body; // Capture update data from request body
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { _id: id },
+      updateData,
+      { new: true, runValidators: true } // Return updated user and run validation
+    );
+
+    if (!updatedUser) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    return res.status(200).send({ msg: "User updated successfully", updatedUser });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: "Internal server error" });
+  }
 }
+
 
 
 export async function generateOTP(req, res){
