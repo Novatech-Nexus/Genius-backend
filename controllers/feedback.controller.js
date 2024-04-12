@@ -28,3 +28,21 @@ export const getFeedback = async (req, res, next) => {
     next(error);
   }
 };
+
+
+// Delete feedback by ID
+export const deleteFeedback = async (req, res, next) => {
+  const { id } = req.params; // Assuming the feedback entry ID is passed as a URL parameter
+  try {
+    // Deleting feedback by ID
+    const deletedFeedback = await feedback.findByIdAndDelete(id);
+    if (!deletedFeedback) {
+      // If feedback not found, sending error response
+      return res.status(404).json({ success: false, message: 'Feedback not found.' }); 
+    }
+    // Sending success response
+    res.status(200).json({ success: true, message: 'Feedback deleted successfully.' });
+  } catch (error) {
+    next(error);
+  }
+};
