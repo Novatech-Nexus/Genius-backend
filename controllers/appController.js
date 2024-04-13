@@ -2,6 +2,7 @@ import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import ENV from '../config.js';
+import otpGenerator from 'otp-generator';
 
 /**Middleware for verify user*/
 export async function verifyUser(req, res, next){
@@ -97,33 +98,30 @@ export async function getUser(req, res) {
   }
 }
 
-
+//Update user function
 export async function updateUser(req, res) {
   try {
-    const { id } = req.params; // Use params for specific user update
+    const { email } = req.body; // Assuming email is in the request body
 
-    if (!id) {
-      return res.status(400).send({ error: "Missing user ID in request parameters" });
+    if (!email) {
+      return res.status(400).send({ error: "Missing email" });
     }
 
-    const updateData = req.body; // Capture update data from request body
+    const body = req.body; // Update data is still in req.body
 
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { _id: id },
-      updateData,
-      { new: true, runValidators: true } // Return updated user and run validation
-    );
+    const updatedUser = await UserModel.findOneAndUpdate({ email }, body);
 
     if (!updatedUser) {
       return res.status(404).send({ error: "User not found" });
     }
 
-    return res.status(200).send({ msg: "User updated successfully", updatedUser });
+    return res.status(201).send({ msg: "Record updated successfully" });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ error: "Internal server error" });
   }
 }
+
 
 
 
@@ -141,6 +139,36 @@ export async function createResetSession(req, res){
 }
 
 export async function resetPassword(req, res){
-    res.json('resetPassword route');
+    try {
+
+      const  { email, password } = req.body;
+
+      try {
+
+        UserModel.findOne({ email })
+            .then(user => {
+                bcrypt.hash(password, 10)
+                  .then(hashedPassword => {
+                    UserModel.updateOne( {email : user.email }, { password: hashedPassword }, function(err, data){
+                      if(err) throw err;
+                      return res.status(201).send({ msg: "Record updated"})
+                    })
+                  })
+                  .catch( e => {
+                    return res.status(500).send({ error: "Unable to hash password" });
+                  })
+                  
+            })
+            .catch( error => {
+              return res.status(404).send({ error: "Email not found" });
+            })
+        
+      } catch (error) {
+        return res.status(500).send({ })
+      }
+      
+    } catch (error) {
+      return res.status(401).send({ error });
+    }
 }
 

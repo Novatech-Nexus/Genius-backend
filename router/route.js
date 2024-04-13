@@ -1,8 +1,9 @@
 import {Router} from 'express';
-
 const router = Router();
 
+// Importing the controller
 import * as controller from '../controllers/appController.js';
+import Auth from '../middleware/auth.js';
 
 // POST methods
 router.route('/register').post(controller.register); // register user
@@ -19,7 +20,8 @@ router.route('/createResetSession').get(controller.createResetSession); // reset
 
 
 // PUT Methods
-router.route('/updateUser/:id').put(controller.updateUser); // is use to update the user profile
+router.route('/updateUser/:id').put(controller.updateUser); 
+// router.route('/updateUser/:id').put(Auth, controller.updateUser);// is use to update the user profile
 router.route('/resetPassword').put(controller.resetPassword); // use to reset password
 
 export default router;
