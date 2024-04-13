@@ -1,11 +1,10 @@
 import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-// import { config } from 'dotenv';
+import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
 
-// config();
-// const URI = process.env.URI;
+config();
 
 /**Middleware for verify user*/
 export async function verifyUser(req, res, next){
@@ -72,7 +71,7 @@ export async function login(req, res) {
     if (!passwordCheck) return res.status(400).send({ error: "Password incorrect" });
 
     // Create JWT token
-    const token = jwt.sign({ userId: user._id, email: user.email }, ENV.JWT_SECRET, { expiresIn: "24h" });
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "24h" });
     return res.status(200).send({ msg: "Login successful", email: user.email, token });
   } catch (error) {
     return res.status(500).send({ error });
