@@ -160,37 +160,34 @@ export async function createResetSession(req, res){
     return res.status(440).send({ error : "Session expired" })
 }
 
-export async function resetPassword(req, res){
-    try {
+export async function resetPassword(req, res) {
+  try {
 
-      const  { email, password } = req.body;
-
-      try {
-
-        UserModel.findOne({ email })
-            .then(user => {
-                bcrypt.hash(password, 10)
-                  .then(hashedPassword => {
-                    UserModel.updateOne( {email : user.email }, { password: hashedPassword }, function(err, data){
-                      if(err) throw err;
-                      return res.status(201).send({ msg: "Record updated"})
-                    })
-                  })
-                  .catch( e => {
-                    return res.status(500).send({ error: "Unable to hash password" });
-                  })
-
-            })
-            .catch( error => {
-              return res.status(404).send({ error: "Email not found" });
-            })
-        
-      } catch (error) {
-        return res.status(500).send({ })
-      }
-      
-    } catch (error) {
-      return res.status(401).send({ error });
+    if(!res.app.locals.resetSession){
+      return res.status(440).send({ error : "Session expired" })
     }
+
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).send({ error: "Email not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updateResult = await UserModel.updateOne(
+      { email: user.email },
+      { password: hashedPassword }
+    );
+
+    if (updateResult.nModified == 0) {
+      throw new Error("No document matches the provided query.");
+    }
+
+    return res.status(201).send({ msg: "Record updated" });
+
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
 }
 
