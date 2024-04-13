@@ -1,5 +1,10 @@
 import jwt from "jsonwebtoken";
-import ENV from '../config.js';
+// import ENV from '../config.js';
+import { config } from 'dotenv';
+
+config();
+const URI = process.env.URI;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**Auth middleware */
 export default async function Auth(req, res, next){

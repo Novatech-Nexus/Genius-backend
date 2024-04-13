@@ -1,8 +1,11 @@
 import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import ENV from '../config.js';
+// import { config } from 'dotenv';
 import otpGenerator from 'otp-generator';
+
+// config();
+// const URI = process.env.URI;
 
 /**Middleware for verify user*/
 export async function verifyUser(req, res, next){
@@ -100,30 +103,35 @@ export async function getUser(req, res) {
 
 //Update user function
 export async function updateUser(req, res) {
+  console.log("updateUser");
+  console.log(req.headers.id);
   try {
-    const { email } = req.body; // Assuming email is in the request body
+    if (!req.headers.id) {
+      return res.status(400).send({ error: "Missing id" });
+    } else {
+      const body = req.body;
 
-    if (!email) {
-      return res.status(400).send({ error: "Missing email" });
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { _id: req.headers.id },
+        body,
+        {
+          new: true,
+        }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).send({ error: "User not found" });
+      } else {
+        return res.status(200).send({ msg: "Record updated successfully" });
+      }
     }
-
-    const body = req.body; // Update data is still in req.body
-
-    const updatedUser = await UserModel.findOneAndUpdate({ email }, body);
-
-    if (!updatedUser) {
-      return res.status(404).send({ error: "User not found" });
-    }
-
-    return res.status(201).send({ msg: "Record updated successfully" });
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ error: "Internal server error" });
-  }
+    return res
+      .status(500)
+      .send({ error: error.message || "Internal server error" });
+  }
 }
-
-
-
 
 export async function generateOTP(req, res){
     res.json('generateOTP route');
@@ -157,7 +165,7 @@ export async function resetPassword(req, res){
                   .catch( e => {
                     return res.status(500).send({ error: "Unable to hash password" });
                   })
-                  
+
             })
             .catch( error => {
               return res.status(404).send({ error: "Email not found" });
