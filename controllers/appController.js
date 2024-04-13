@@ -102,9 +102,11 @@ export async function getUser(req, res) {
 
 //Update user function
 export async function updateUser(req, res) {
-  console.log("updateUser");
-  console.log(req.headers.id);
+  
   try {
+
+    const { email } = req.body;
+
     if (!req.headers.id) {
       return res.status(400).send({ error: "Missing id" });
     } else {
@@ -133,7 +135,7 @@ export async function updateUser(req, res) {
 }
 
 export async function generateOTP(req, res){
-    res.json('generateOTP route');
+    // let OTP = otpGenerator.generate(6, {lowercaseAlphabets : false, upperCaseAlphabets : false, specialChars : false });
 }
 
 
