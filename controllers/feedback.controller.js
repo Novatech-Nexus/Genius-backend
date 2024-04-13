@@ -68,3 +68,32 @@ export const updateFeedback = async (req, res, next) => {
     next(error);
   }
 };
+
+
+// Get pending feedback awaiting approval
+export const getFeedbackApproval = async (req, res, next) => {
+  try {
+    // Fetching feedback with status 'pending'
+    const approvedFeedbackData = await feedback.find({ status: 'pending' });
+    // Sending pending feedback data as response
+    res.status(200).json(approvedFeedbackData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// Approve feedback by ID
+export const approveFeedback = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    // Finding and updating feedback status to 'approved' by ID
+    const updatedFeedback = await feedback.findByIdAndUpdate(id, { status: 'approved' }, { new: true });
+    if (!updatedFeedback) {
+      return res.status(404).json({ success: false, message: 'Feedback not found.' });
+    }
+    res.status(200).json({ success: true, message: 'Feedback approved successfully.', feedback: updatedFeedback });
+  } catch (error) {
+    next(error);
+  }
+};
