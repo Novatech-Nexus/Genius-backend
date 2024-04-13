@@ -2,7 +2,7 @@ import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-import otpGenerator from 'otp-generator';
+import { otpGen } from "otp-gen-agent";
 
 config();
 
@@ -135,16 +135,29 @@ export async function updateUser(req, res) {
 }
 
 export async function generateOTP(req, res){
-    // let OTP = otpGenerator.generate(6, {lowercaseAlphabets : false, upperCaseAlphabets : false, specialChars : false });
-}
+    req.app.locals.OTP = await otpGen();
+    res.status(201).send({ code : req.app.locals.OTP });
+  }
 
 
 export async function verifyOTP(req, res){
-    res.json('verifyOTP route');
+    const { code } = req.query;
+    if(parseInt(req.app.locals.OTP) === parseInt(code)){
+      req.app.locals.OTP = null;  //reset the OTP value
+      req.app.locals.resetSession = true;  //start the session for reset password
+      return res.status(201).send({ msg : "Verify Succesfully" });
+    }
+    else{
+      return res.status(400).send({ error : "Invalid OTP" });
+    }
 }
 
 export async function createResetSession(req, res){
-    res.json('createResetSession route');
+    if(req.app.locals.resetSession){
+      req.app.locals.resetSession = false;  //allow access to this route only once
+      return res.status(201).send({ msg : "Accessc granted"})
+    }
+    return res.status(440).send({ error : "Session expired" })
 }
 
 export async function resetPassword(req, res){
