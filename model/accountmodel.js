@@ -23,6 +23,10 @@ const accountmodelSchema = new Schema({
         type: String,
         required: true
     },
+    tNumber:{
+        type : String,
+        required: true
+    },
     nGuest: {
         type: String,
         required: true

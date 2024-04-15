@@ -1,3 +1,4 @@
+const { error } = require('console');
 const Account = require('../models/accountmodel');
 
 const mongoose = require('mongoose')
@@ -32,11 +33,39 @@ const getAccount = async (req, res) => {
 //create new account
 const createAccount = async (req, res) =>
 {
-    const {userName,contactNo, date, time, category, nGuest} = req.body
- 
+    const {userName,contactNo, date, time, category,tNumber, nGuest} = req.body
+    
+    let emptyFields = []
+
+    if(!userName) {
+        emptyFields.push('userName')
+    }
+    if(!contactNo) {
+        emptyFields.push('contactNo')
+    }
+    if(!date) {
+        emptyFields.push('date')
+    }
+    if(!time) {
+        emptyFields.push('time')
+    }
+    if(!category) {
+        emptyFields.push('category')
+    }
+    if(!tNumber) {
+        emptyFields.push('tNumber')
+    }
+    if(!nGuest) {
+        emptyFields.push('nGuest')
+    }
+
+    if (emptyFields.length >0){
+        return res.status(400).json({error: 'Please fill in all fields' , emptyFields})
+    }
+
     //add doc to db
     try {
-        const account = await Account.create({userName,contactNo, date, time, category, nGuest})
+        const account = await Account.create({userName,contactNo, date, time, category, tNumber, nGuest})
         res.status(200).json(account)
     } catch (error) {
         res.status(400).json({error: error.message})
