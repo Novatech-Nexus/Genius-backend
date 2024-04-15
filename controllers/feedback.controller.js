@@ -97,3 +97,15 @@ export const approveFeedback = async (req, res, next) => {
     next(error);
   }
 };
+
+
+// Get all approved feedback
+export const getApprovedFeedback = async (req, res, next) => {
+  try {
+    // Fetching feedback with status 'approved'
+    const pastApprovedFeedback  = await feedback.find({ status: 'approved' });
+    res.status(200).json(pastApprovedFeedback);
+  } catch (error) {
+    next(error);
+  }
+};
