@@ -55,13 +55,26 @@ export const updateFeedback = async (req, res, next) => {
   const { id } = req.params;
 
   // Destructuring updated data from request body
-  const { name, email, rating, message } = req.body;
+  const { name, email, rating, message, status } = req.body;
   try {
-    // Finding and updating feedback by ID
-    const updatedFeedback = await feedback.findByIdAndUpdate(id, { name, email, rating, message }, { new: true });
+    // Find the existing feedback
+    const existingFeedback = await feedback.findById(id);
+    if (!existingFeedback) {
+      return res.status(404).json({ success: false, message: 'Feedback not found.' });
+    }
+
+    // If the feedback was previously approved and the status is being changed,
+    // set the status to 'pending'
+    if (existingFeedback.status === 'approved' && status !== 'approved') {
+      req.body.status = 'pending';
+    }
+
+    // Updating feedback by ID
+    const updatedFeedback = await feedback.findByIdAndUpdate(id, { name, email, rating, message, status }, { new: true });
     if (!updatedFeedback) {
       return res.status(404).json({ success: false, message: 'Feedback not found.' });
     }
+
     // Sending success response with updated feedback data
     res.status(200).json({ success: true, message: 'Feedback updated successfully.', feedback: updatedFeedback });
   } catch (error) {
