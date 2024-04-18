@@ -48,6 +48,9 @@ router.post("/add", async (req, res) => {
         res.json({ message: "Item added successfully" });
     } catch (err) {
         console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
         res.status(500).json({ error: "Error adding item" });
     }
 });
@@ -85,6 +88,9 @@ router.put("/update/:id", async (req, res) => {
         res.json({ message: "Menu updated successfully" });
     } catch (err) {
         console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
         res.status(500).json({ error: "Error updating menu" });
     }
 });
