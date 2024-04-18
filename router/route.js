@@ -24,7 +24,6 @@ router.route('/updateUser').put(controller.updateUser); // is use to update the 
 router.route('/resetPassword').put(controller.resetPassword); // use to reset password
 
 
-
 //MenuManagement
 
 // Route to add a new menu item

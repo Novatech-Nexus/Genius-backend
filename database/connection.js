@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
+ 
 async function connect(){
    
  
@@ -8,5 +8,5 @@ async function connect(){
     console.log("Database connected");
     return db;
 }
-
+ 
 export default connect;
