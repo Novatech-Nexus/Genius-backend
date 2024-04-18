@@ -134,12 +134,13 @@ export async function updateUser(req, res) {
   }
 }
 
+//Generate OTP function
 export async function generateOTP(req, res){
     req.app.locals.OTP = await otpGen();
     res.status(201).send({ code : req.app.locals.OTP });
   }
 
-
+//Verify OTP function
 export async function verifyOTP(req, res){
     const { code } = req.query;
     if(parseInt(req.app.locals.OTP) === parseInt(code)){
@@ -152,14 +153,15 @@ export async function verifyOTP(req, res){
     }
 }
 
+//Reset session function
 export async function createResetSession(req, res){
     if(req.app.locals.resetSession){
-      req.app.locals.resetSession = false;  //allow access to this route only once
-      return res.status(201).send({ msg : "Accessc granted"})
+      return res.status(201).send({ flag: req.app.locals.resetSession })
     }
     return res.status(440).send({ error : "Session expired" })
 }
 
+//Reset password function
 export async function resetPassword(req, res) {
   try {
 

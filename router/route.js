@@ -14,6 +14,7 @@ router.route('/login').post(controller.verifyUser, controller.login); // login i
 
 
 // GET Methods
+router.route('/user/').get(controller.getUser); // get all users
 router.route('/user/:email').get(controller.getUser); // user with email
 router.route('/generateOTP').get(controller.verifyUser, localVariables, controller.generateOTP); //generate random OTP
 router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP); //verify generated OTP

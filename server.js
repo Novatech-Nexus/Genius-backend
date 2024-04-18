@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("tiny"));
 app.disable('x-powered-by'); //less hackers know about our stack
-app.use(bodyParser.json({ limit: '50mb' })); //limit the size of the request body
+app.use(bodyParser.json({ limit: '10/0mb' })); //limit the size of the request body
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); 
 
 
