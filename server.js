@@ -6,7 +6,7 @@ import router from './router/route.js';
  
  
 const app= express();
- 
+
 // middlewares
 app.use(express.json());
 app.use(cors());
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
  
 // API routes
 app.use('/api', router);
-app.use("/api/employees", router);
+app.use("/employee", router);
  
  
  

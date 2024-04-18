@@ -1,7 +1,8 @@
 import {Router} from 'express';
-import Employees from '../model/employee.js';
+import Employee from '../model/employee.js'
 
 const router = Router();
+
 
 import * as controller from '../controllers/appController.js';
 
@@ -28,35 +29,115 @@ router.route('/resetPassword').put(controller.resetPassword); // use to reset pa
 //test
 router.get("/test", (req, res) => res.send("Employee routes working"));
 
-router.post("/", (req, res) => {
-  Employees.create(req.body)
-    .then(() => res.json({ msg: "Employee added successfully" }))
-    .catch(() => res.status(400).json({ msg: "Employee adding failed" }));
+router.post("/add", async (req, res) => {
+  try {
+      const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+
+      // Input validation
+      if (!employeeID || !nic) {
+          return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const newEmployee = new Employee({
+          employeeID,
+          firstname,
+          lastname,
+          gender,
+          nic,
+          email,
+          jobtype,
+          mobile,
+          address,
+          city
+      });
+
+      await newEmployee.save();
+      res.json({ message: "Employee added successfully" });
+  } catch (err) {
+      console.error(err);
+      if (err.name === 'ValidationError') {
+          return res.status(400).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Error adding employee" });
+    }
 });
 
-router.get("/", (req, res) => {
-  Employees.find()
-    .then((employees) => res.json(employees))
-    .catch(() => res.status(400).json({ msg: "No employees found" }));
+
+router.route("/").get(async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error retrieving employees" });
+  }
 });
 
-router.get("/:id", (req, res) => {
-  Employees.findById(req.params.id)
-    .then((employee) => res.json(employee))
-    .catch(() => res.status(400).json({ msg: "Cannot find this employee" }));
+router.get("/get/:id", async (req, res) => {
+  try {
+      const employee = await Employee.findById(req.params.id);
+
+      if (!employee) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json(employee);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error fetching employee" });
+    }
 });
 
-router.put("/:id", (req, res) => {
-  Employees.findByIdAndUpdate(req.params.id, req.body)
-    .then(() => res.json({ msg: "Update Successfully" }))
-    .catch(() => res.status(400).json({ msg: "Update failed" }));
+
+
+router.put("/update/:id", async (req, res) => {
+  try {
+      const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+
+      const updatedEmployee = {
+          employeeID,
+          firstname,
+          lastname,
+          gender,
+          nic,
+          email,
+          jobtype,
+          mobile,
+          address,
+          city
+      };
+
+      const updatedItem = await Employee.findByIdAndUpdate(req.params.id, updatedEmployee, { new: true });
+
+      if (!updatedItem) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json({ message: "Employee updated successfully" });
+  } catch (err) {
+      console.error(err);
+      if (err.name === 'ValidationError') {
+          return res.status(400).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Error updating employee" });
+    }
 });
 
-router.delete("/:id", (req, res) => {
-  Employees.findByIdAndDelete(req.params.id)
-    .then(() => res.json({ msg: "Delete successfully" }))
-    .catch(() => res.status(400).json({ msg: "Cannot delete" }));
+router.delete("/delete/:id", async (req, res) => {
+  try {
+      const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
+
+      if (!deletedEmp) {
+          return res.status(404).json({ error: "emp not found" });
+      }
+
+      res.json({ message: "emp deleted successfully" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error deleting emp" });
+    }
 });
+
 
 
 export default router;

@@ -24,7 +24,7 @@ const EmployeeSchema = new Schema({
     type: String,
   },
   jobtype: {
-    type: String,
+    type: String,enum:['manager','chef','cashier']
   },
   mobile: {
     type: String,
