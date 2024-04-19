@@ -14,7 +14,7 @@ router.route('/login').post(controller.verifyUser, controller.login); // login i
 
 
 // GET Methods
-router.route('/user/').get(controller.getUser); // get all users
+router.route('/users').get(controller.getAllUsers); // get all users
 router.route('/user/:email').get(controller.getUser); // user with email
 router.route('/generateOTP').get(controller.verifyUser, localVariables, controller.generateOTP); //generate random OTP
 router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP); //verify generated OTP
@@ -24,5 +24,9 @@ router.route('/createResetSession').get(controller.createResetSession); // reset
 // PUT Methods
 router.route("/updateUser").put(Auth, controller.updateUser);
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // use to reset password
+
+// DELETE Methods
+router.route('/deleteUser').delete(Auth, controller.deleteUser); // delete user
+//methana deleteUser kiyanne appController eke thiyena function eka 
 
 export default router;
