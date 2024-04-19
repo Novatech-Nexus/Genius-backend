@@ -32,17 +32,24 @@ router.post("/add", async (req, res) => {
         const { itemId, itemName, price, description, category } = req.body;
 
         // Input validation
-        if (!itemId || !itemName || !price || !description || !category) {
+        if (!itemId || !itemName || !price || !category) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const newMenu = new Menu({
+        // Create a newMenu object with or without the description field
+        const newMenuData = {
             itemId,
             itemName,
             category,
             price,
-            description
-        });
+        };
+
+        // Add the description field if provided
+        if (description) {
+            newMenuData.description = description;
+        }
+
+        const newMenu = new Menu(newMenuData);
 
         await newMenu.save();
         res.json({ message: "Item added successfully" });
@@ -55,6 +62,7 @@ router.post("/add", async (req, res) => {
     }
 });
 
+
 // Route to get all menu items
 router.get("/", async (req, res) => {
     try {
@@ -65,6 +73,7 @@ router.get("/", async (req, res) => {
         res.status(500).json({ error: "Error fetching items" });
     }
 });
+
 
 // Route to update a menu item
 router.put("/update/:id", async (req, res) => {

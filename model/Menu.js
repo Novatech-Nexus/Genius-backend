@@ -8,7 +8,7 @@ const menuSchema = new Schema({
     itemName: { type: String, required: true },
     category: { type: String, required: true, enum: ['Beverage', 'Food', 'Set Menu','Catering Menu','Offers'] },
     price: { type: Number, required: true },
-    description: { type: String, required: true }
+    description: { type: String}
 });
 
 const Menu = mongoose.model("Menu", menuSchema);
