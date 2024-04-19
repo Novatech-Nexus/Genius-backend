@@ -85,6 +85,7 @@ export async function getUser(req, res) {
   const { email } = req.params;
   console.log({ email });
 
+
   try {
     if (!email) return res.status(501).send({ error: "Email not found" });
 
@@ -229,6 +230,3 @@ export async function resetPassword(req, res) {
     return res.status(500).send({ error: error.message });
   }
 }
-
-
-
