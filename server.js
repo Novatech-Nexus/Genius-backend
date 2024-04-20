@@ -3,7 +3,8 @@ import cors from 'cors';
 import morgan from 'morgan'; //is used to log all the http requests inside the console
 import connect from './database/connection.js';
 import router from './router/route.js';
-
+import orderRoutes from './router/orderRoutes.js';
+import orderCartRoutes from './router/orderCartRoutes.js';
 
 const app= express();
 
@@ -13,8 +14,7 @@ app.use(cors());
 app.use(morgan("tiny"));
 app.disable('x-powered-by'); //less hackers know about our stack
 
-
-const PORT = 8080;
+const PORT = 5050;
 
 //HTTP GET request
 app.get('/', (req, res) => {
@@ -24,7 +24,9 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api', router);
 
-
+ //route Order-user details 
+ app.use('/api/orders', orderRoutes);
+ app.use('/api/orderCart', orderCartRoutes);
 
 //start server when we have a valid connection
 connect().then( () => {
@@ -38,4 +40,3 @@ connect().then( () => {
 }).catch(error => {
     console.log("Invalid database connection.");
 })
-
