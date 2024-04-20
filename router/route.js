@@ -1,4 +1,5 @@
 import {Router} from 'express';
+import Item from '../model/inventory_item.js';
 
 const router = Router();
 
@@ -110,5 +111,86 @@ router.route("/delete/:id").delete(async(req,res)=>{
         res.status(500).send({status:"Error with delete order",error:err.message});
     })
 })
+
+
+//inventory ----------------------------------------------------------------------
+
+router.route("/add").post((req,res)=>{
+    const code = req.body.inputCode;
+    const name = req.body.inputName;
+    const igroup = req.body.inputIgroup;
+    const quantity =req.body.inputQuentity;
+    const kg = req.body.inputKg;
+    const cost = req.body.inputCost;
+    const discription = req.body.inputDiscription;
+
+    const newItem = new Item({
+        code,
+        name,
+        igroup,
+        quantity,
+        kg,
+        cost,
+        discription
+    })
+    newItem.save().then(()=>{
+        res.json("New item added")
+    }).catch(((err)=>{
+        console.log(err);
+    }))
+
+})
+router.route("/").get((req,res)=>{
+    Item.find().then((item)=>{
+        res.json(item)
+    }).catch((err)=>{
+        console.log(err)
+    })
+})
+
+router.route("/update/:id").put(async(req,res)=>{
+    let itemId = req.params.id;
+    const {code,name,igroup,quantity,kg,cost} = req.body;
+    
+    const updateItem = {
+        code,
+        name,
+        igroup,
+        quantity,
+        kg,
+        cost,
+    }
+    const update = await Item.findByIdAndUpdate(itemId,updateItem)
+    .then(()=>{
+        res.status(200).send({status:"user updated"})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with updating data",error:err.message});
+    })
+
+})
+
+router.route("/delete/:id").delete(async(req,res)=>{
+    let itemId = req.params.id;
+    await Item.findByIdAndDelete(itemId)
+    .then(()=>{
+        res.status(200).send({status:"User deleted"});
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with delete data",error:err.message});
+    })
+})
+router.route("/get/:id").get(async(req,res)=>{
+    let itemId = req.params.id;
+    const item =  await Item.findById(itemId)
+    .then((item)=>{
+        // res.status(200).send({status:"User fetched",item});
+        res.status(200).send(item);
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with fetched data",error:err.message});
+    })
+})
+
 
 export default router;
