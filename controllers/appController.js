@@ -1,8 +1,9 @@
 import UserModel from "../model/User.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-//import ENV from '../config.js';
-import { config } from "dotenv";
+import { config } from 'dotenv';
+import { otpGen } from "otp-gen-agent";
+
 config();
 
 /**Middleware for verify user*/
@@ -44,6 +45,7 @@ export async function register(req, res) {
       email,
       phoneNumber,
       password: hashedPassword,
+      role: 'customer'
     });
 
     await user.save();
@@ -57,7 +59,6 @@ export async function register(req, res) {
 }
 
 // Login function
-// User kiyalamai variable ekak haduwe methana: "const user = await UserModel.findOne({ email });"
 export async function login(req, res) {
   const { email, password } = req.body;
 
@@ -70,8 +71,9 @@ export async function login(req, res) {
     if (!passwordCheck) return res.status(400).send({ error: "Password incorrect" });
 
     // Create JWT token
-    const token = jwt.sign({ userId: user._id, email: user.email }, ENV.JWT_SECRET, { expiresIn: "24h" });
-    return res.status(200).send({ msg: "Login successful", email: user.email, token });
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "24h" });
+    console.log(user);
+    return res.status(200).send({ msg: "Login successful", email: user.email, token, id: user._id});
   } catch (error) {
     return res.status(500).send({ error });
   }
@@ -81,6 +83,8 @@ export async function login(req, res) {
 // Get user function
 export async function getUser(req, res) {
   const { email } = req.params;
+  console.log({ email });
+
 
   try {
     if (!email) return res.status(501).send({ error: "Email not found" });
@@ -99,27 +103,130 @@ export async function getUser(req, res) {
   }
 }
 
+//Update user function
+export async function updateUser(req, res) {
+  
+  try {
 
+    const { email } = req.body;
 
-export async function updateUser(req, res){
-    res.json('updateUser route');
+    if (!req.headers.id) {
+      return res.status(400).send({ error: "Missing id" });
+    } else {
+      const body = req.body;
+
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { _id: req.headers.id },
+        body,
+        {
+          new: true,
+        }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).send({ error: "User not found" });
+      } else {
+        return res.status(200).send({ msg: "Record updated successfully" });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send({ error: error.message || "Internal server error" });
+  }
+}
+
+//delete user function
+export async function deleteUser(req, res){
+  try {
+    if (!req.headers.id) {
+      return res.status(400).send({ error: "Missing id" });
+    } else {
+      const deletedUser = await UserModel.findOneAndDelete({ _id: req.headers.id });
+
+      if (!deletedUser) {
+        return res.status(404).send({ error: "User not found" });
+      } else {
+        return res.status(200).send({ msg: "Record deleted successfully" });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send({ error: error.message || "Internal server error" });
+  }
+
+}
+
+//get all users
+export async function getAllUsers(req, res) {
+  try {
+    const users = await UserModel.find({}, '-password'); // Exclude password field from the response
+    return res.status(200).send(users);
+  } catch (error) {
+    res.status(500).send({ error });
+  }
 }
 
 
+
+//Generate OTP function
 export async function generateOTP(req, res){
-    res.json('generateOTP route');
-}
+    req.app.locals.OTP = await otpGen();
+    res.status(201).send({ code : req.app.locals.OTP });
+  }
 
-
+//Verify OTP function
 export async function verifyOTP(req, res){
-    res.json('verifyOTP route');
+    const { code } = req.query;
+    if(parseInt(req.app.locals.OTP) === parseInt(code)){
+      req.app.locals.OTP = null;  //reset the OTP value
+      req.app.locals.resetSession = true;  //start the session for reset password
+      return res.status(201).send({ msg : "Verify Succesfully" });
+    }
+    else{
+      return res.status(400).send({ error : "Invalid OTP" });
+    }
 }
 
+//Reset session function
 export async function createResetSession(req, res){
-    res.json('createResetSession route');
+    if(req.app.locals.resetSession){
+      return res.status(201).send({ flag: req.app.locals.resetSession })
+    }
+    return res.status(440).send({ error : "Session expired" })
 }
 
-export async function resetPassword(req, res){
-    res.json('resetPassword route');
-}
+//Reset password function
+export async function resetPassword(req, res) {
+  try {
 
+    if(!res.app.locals.resetSession){
+      return res.status(440).send({ error : "Session expired" })
+    }
+
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).send({ error: "Email not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updateResult = await UserModel.updateOne(
+      { email: user.email },
+      { password: hashedPassword }
+    );
+
+    if (updateResult.nModified == 0) {
+      throw new Error("No document matches the provided query.");
+    }
+
+    return res.status(201).send({ msg: "Record updated" });
+
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+}
