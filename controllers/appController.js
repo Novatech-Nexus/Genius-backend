@@ -59,7 +59,6 @@ export async function register(req, res) {
 }
 
 // Login function
-// User kiyalamai variable ekak haduwe methana: "const user = await UserModel.findOne({ email });"
 export async function login(req, res) {
   const { email, password } = req.body;
 
