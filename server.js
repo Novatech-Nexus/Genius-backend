@@ -6,6 +6,7 @@ import router from './router/route.js';
 import bodyParser from 'body-parser';
 
 
+
 const app= express();
 
 // middlewares
@@ -18,7 +19,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 
-const PORT = 8080;
+const PORT = process.env.PORT || 5050;
 
 //HTTP GET request
 app.get('/', (req, res) => {
@@ -28,6 +29,9 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api', router);
 
+
+//catering
+app.use('/CatOrdering', router);
 
 
 //start server when we have a valid connection
