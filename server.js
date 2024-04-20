@@ -3,6 +3,9 @@ import cors from 'cors';
 import morgan from 'morgan'; //is used to log all the http requests inside the console
 import connect from './database/connection.js';
 import router from './router/route.js';
+import bodyParser from 'body-parser';
+
+
 import feedbackRouter from './router/feedback.route.js';
 
 const app= express();
@@ -12,8 +15,12 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("tiny"));
 app.disable('x-powered-by'); //less hackers know about our stack
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-const PORT = 5050;
+
+
+const PORT = process.env.PORT || 5050;
 
 //HTTP GET request
 app.get('/', (req, res) => {
@@ -25,6 +32,10 @@ app.use('/api', router);
 
  //route Feedback 
 app.use("/api/feedback",feedbackRouter);
+
+//catering
+app.use('/CatOrdering', router);
+
 
 //start server when we have a valid connection
 connect().then( () => {
