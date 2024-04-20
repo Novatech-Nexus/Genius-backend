@@ -35,8 +35,8 @@ export const registerMail = async (req, res) => {
         body: {
             name: userEmail,
             intro: text || 'Welcome to Genius Restaurant! We are very excited to have you on board.',
-            outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
-        }
+            outro: 'Visit us from here : `genius-frontend.vercel.app` Need help, or have questions? Just reply to this email, we\'d love to help.'
+        } 
     }
 
     //Pass the email to the MailGenerator
