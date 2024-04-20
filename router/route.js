@@ -111,4 +111,109 @@ router.route("/delete/:id").delete(async(req,res)=>{
     })
 })
 
+//reservation Management
+
+router.route("/add").post(async (req, res) => {
+    const {
+        userName,
+        contactNo,
+        date,
+        time,
+        category,
+        tNumber,
+        nGuest
+    } = req.body;
+
+    try {
+        const existingReservation = await Reservation.findOne({
+            date,
+            time,
+            category,
+            tNumber
+        });
+    
+        if(existingReservation) {
+            return res.status(400).json({ message: 'This table is already booked for the selected date and time' });
+        }
+
+    const newReservation = new Reservation({
+        userName,
+        contactNo,
+        date,
+        time,
+        category,
+        tNumber,
+        nGuest
+    });
+
+    
+        await newReservation.save();
+        res.status(201).json("Reservation Added Successfully.");
+    }catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error adding reservation." });
+    }
+});
+
+
+// GET all reservations
+router.route('/').get(async (req, res) => {
+    try {
+        const reservations = await Reservation.find();
+        res.json(reservations);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
+
+// UPDATE a reservation
+router.route('/update/:id').put(async (req, res) => {
+    const userId = req.params.id;
+    const updateReservation = req.body;
+
+    try {
+        const updatedReservation = await Reservation.findByIdAndUpdate(userId, updateReservation, { new: true });
+        if (!updatedReservation) {
+            return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
+        }
+        res.status(200).send({ status: 'Reservation Updated Successfully', reservation: updatedReservation });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
+
+// DELETE a reservation
+router.route('/delete/:id').delete(async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const deletedReservation = await Reservation.findByIdAndDelete(userId);
+        if (!deletedReservation) {
+            return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
+        }
+        res.status(200).send({ status: 'Reservation Deleted Successfully' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
+
+// Route to get a reservation  by ID
+router.get("/get/:id", async (req, res) => {
+    try {
+        const reserve= await Reservation.findById(req.params.id);
+
+        if (!reserve) {
+            return res.status(404).json({ error: "reservation not found" });
+        }
+
+        res.json(reserve);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching reservation" });
+    }
+});
+
 export default router;

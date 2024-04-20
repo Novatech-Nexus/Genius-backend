@@ -35,6 +35,9 @@ app.use('/api', router);
 //catering
 app.use('/CatOrdering', router);
 
+//Reservation
+app.use('/Reservation', router);
+
  //route Order-user details 
  app.use('/api/orders', orderRoutes);
  app.use('/api/orderCart', orderCartRoutes);
