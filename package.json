@@ -21,6 +21,7 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mailgen": "^2.0.28",
+    "lodash.includes": "^4.3.0",
     "mongodb-memory-server": "^9.1.8",
     "mongoose": "^8.2.4",
     "morgan": "^1.10.0",
