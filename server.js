@@ -42,12 +42,3 @@ connect().then( () => {
     console.log("Invalid database connection.");
 })
 
-// //IT22114808
-// const menuRouter = require("./routes/menus.js");
-// app.use("/item", menuRouter);
-
-// app.listen(PORT, () => {
-//   console.log(`Server is up and running on port ${PORT}`);
-// });
-
- 
