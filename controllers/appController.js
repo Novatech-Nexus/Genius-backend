@@ -1,5 +1,5 @@
 import UserModel from "../model/User.model.js";
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { otpGen } from "otp-gen-agent";

@@ -17,6 +17,7 @@ const reservationSchema = new Schema({
         type: Number,
         required: true
     },
+
     date: {
         type: String,
         required: true
@@ -45,7 +46,13 @@ const reservationSchema = new Schema({
     },
     nGuest: {
         type: Number,
-        required: true
+        required: true,
+        validate: {
+            validator: function(value) {
+                return value >= 1 && value <= 15; // Ensure nGuest is between 1 and 15
+            },
+            message: props => `${props.value} is not a valid number of guests (must be between 1 and 15)`
+        }
     }
 });
 
