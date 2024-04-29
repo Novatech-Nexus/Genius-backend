@@ -8,6 +8,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 
 import CatOrdering from '../model/CatOrdering.js';
+import Reservation from '../model/reservation.js'
 
 // POST methods
 router.route('/register').post(controller.register); // register user
@@ -109,11 +110,11 @@ router.route("/delete/:id").delete(async(req,res)=>{
         console.log(err.message);
         res.status(500).send({status:"Error with delete order",error:err.message});
     })
-})
+});
 
 //reservation Management
 
-router.route("/add").post(async (req, res) => {
+router.route("/addtr").post(async (req, res) => {
     const {
         userName,
         contactNo,
@@ -157,7 +158,7 @@ router.route("/add").post(async (req, res) => {
 
 
 // GET all reservations
-router.route('/').get(async (req, res) => {
+router.route('/tr').get(async (req, res) => {
     try {
         const reservations = await Reservation.find();
         res.json(reservations);
@@ -168,7 +169,7 @@ router.route('/').get(async (req, res) => {
 });
 
 // UPDATE a reservation
-router.route('/update/:id').put(async (req, res) => {
+router.route('/updatetr/:id').put(async (req, res) => {
     const userId = req.params.id;
     const updateReservation = req.body;
 
@@ -185,7 +186,7 @@ router.route('/update/:id').put(async (req, res) => {
 });
 
 // DELETE a reservation
-router.route('/delete/:id').delete(async (req, res) => {
+router.route('/deletetr/:id').delete(async (req, res) => {
     const userId = req.params.id;
 
     try {
@@ -201,7 +202,7 @@ router.route('/delete/:id').delete(async (req, res) => {
 });
 
 // Route to get a reservation  by ID
-router.get("/get/:id", async (req, res) => {
+router.get("/gettr/:id", async (req, res) => {
     try {
         const reserve= await Reservation.findById(req.params.id);
 
@@ -215,5 +216,6 @@ router.get("/get/:id", async (req, res) => {
         res.status(500).json({ error: "Error fetching reservation" });
     }
 });
+
 
 export default router;
