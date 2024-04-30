@@ -11,8 +11,8 @@ let nodeConfig = {
   port: 587,
   secure: false, // Use `true` for port 465, `false` for all other ports
   auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
+    user: "blanche32@ethereal.email",
+    pass: "SBpN9MRyYnCBgdCdvk",
   },
 } 
 
@@ -26,25 +26,33 @@ let MailGenerator = new Mailgen({
     }
 })
 
+/** POST: http://localhost:8080/api/registerMail 
+ * @param: {
+ *  "email": "",
+ *  "text": "",
+ *  "subject": ""
+ * }
+*/
+
 //controller
 export const registerMail = async (req, res) => {
-    const { userEmail, text, subject } = req.body;
+    const { email, text, subject } = req.body;
 
     //body of the email
-    var email = {
+    var Email = {
         body: {
-            name: userEmail,
+            name: email,
             intro: text || 'Welcome to Genius Restaurant! We are very excited to have you on board.',
             outro: 'Visit us from here : `genius-frontend.vercel.app` Need help, or have questions? Just reply to this email, we\'d love to help.'
         } 
     }
 
     //Pass the email to the MailGenerator
-    var emailBody = MailGenerator.generate(email);
+    var emailBody = MailGenerator.generate(Email);
     
     let message = {
-        from : process.env.EMAIL,
-        to : userEmail,
+        from : "blanche32@ethereal.email",
+        to : email,
         subject : subject || "Welcome to Genius Restaurant",
         html : emailBody
     }
@@ -57,10 +65,3 @@ export const registerMail = async (req, res) => {
         .catch(error => res.status(500).send({ error }))
 }
 
-/** POST: http://localhost:8080/api/registerMail 
- * @param: {
- *  "userEmail": "",
- *  "text": "",
- *  "subject": ""
- * }
-*/
