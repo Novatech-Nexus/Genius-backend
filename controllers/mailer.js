@@ -6,13 +6,10 @@ config();
 
 // https://ethereal.email/create
 let nodeConfig = {
-    
-  host: "smtp.ethereal.email",
-  port: 587,
-  secure: false, // Use `true` for port 465, `false` for all other ports
+  service: "Gmail",
   auth: {
-    user: "blanche32@ethereal.email",
-    pass: "SBpN9MRyYnCBgdCdvk",
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
   },
 } 
 
@@ -36,14 +33,14 @@ let MailGenerator = new Mailgen({
 
 //controller
 export const registerMail = async (req, res) => {
-    const { email, text, subject } = req.body;
+    const { userEmail, text, subject } = req.body;
 
     //body of the email
     var Email = {
         body: {
-            name: email,
-            intro: text || 'Welcome to Genius Restaurant! We are very excited to have you on board.',
-            outro: 'Visit us from here : `genius-frontend.vercel.app` Need help, or have questions? Just reply to this email, we\'d love to help.'
+            name: userEmail,
+            intro: 'Welcome to Genius Restaurant! We are very excited to have you on board.',
+            outro: `<a href="${text}">To recover your account please click here. </a>`
         } 
     }
 
@@ -51,8 +48,8 @@ export const registerMail = async (req, res) => {
     var emailBody = MailGenerator.generate(Email);
     
     let message = {
-        from : "blanche32@ethereal.email",
-        to : email,
+        from : process.env.EMAIL,
+        to : userEmail,
         subject : subject || "Welcome to Genius Restaurant",
         html : emailBody
     }
@@ -64,4 +61,3 @@ export const registerMail = async (req, res) => {
         })
         .catch(error => res.status(500).send({ error }))
 }
-
