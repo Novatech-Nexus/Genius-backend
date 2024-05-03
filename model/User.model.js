@@ -20,6 +20,9 @@ export const UserSchema = new mongoose.Schema({
         required: [true, "Please provide a password"],
         unique: false,
     },
+    role: {
+        type :String
+    }
 }) 
 
 export default mongoose.model.Users || mongoose.model('User', UserSchema)

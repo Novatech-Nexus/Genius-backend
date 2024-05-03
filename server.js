@@ -24,6 +24,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api', router);
 app.use("/employee", router);
+app.use("/salary",router);
  
  
  
