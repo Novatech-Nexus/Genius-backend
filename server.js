@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 
 
 import feedbackRouter from './router/feedback.route.js';
+import contactRouter from './router/contact.route.js';
 
 const app= express();
 
@@ -36,6 +37,8 @@ app.use("/api/feedback",feedbackRouter);
 //catering
 app.use('/CatOrdering', router);
 
+//route contact
+app.use("/api/contact",contactRouter);
 
 //start server when we have a valid connection
 connect().then( () => {
