@@ -6,6 +6,8 @@ import router from './router/route.js';
 import bodyParser from 'body-parser';
 
 
+import orderRoutes from './router/orderRoutes.js';
+import orderCartRoutes from './router/orderCartRoutes.js';
 import feedbackRouter from './router/feedback.route.js';
 import contactRouter from './router/contact.route.js';
 
@@ -37,7 +39,14 @@ app.use("/api/feedback",feedbackRouter);
 //catering
 app.use('/CatOrdering', router);
 
-//route contact
+//Reservation
+app.use('/Reservation', router);
+
+ //route Order-user details 
+ app.use('/api/orders', orderRoutes);
+ app.use('/api/orderCart', orderCartRoutes);
+
+ //route contact
 app.use("/api/contact",contactRouter);
 
 //start server when we have a valid connection

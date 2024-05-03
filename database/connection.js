@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
  
+ 
 async function connect(){
     
     mongoose.set('strictQuery', true)
