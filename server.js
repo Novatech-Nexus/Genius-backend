@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 5050;
 app.get('/', (req, res) => {
     res.status(201).json("Home GET request");
 });
-
+ 
 // API routes
 app.use('/api', router);
 
@@ -41,6 +41,10 @@ app.use('/Reservation', router);
  //route Order-user details 
  app.use('/api/orders', orderRoutes);
  app.use('/api/orderCart', orderCartRoutes);
+
+ //Employee
+ app.use("/employee", router);
+app.use("/salary",router);
 
 //start server when we have a valid connection
 connect().then( () => {
