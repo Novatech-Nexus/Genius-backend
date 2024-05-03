@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "otp-gen-agent": "^1.1.2",
+    "sweetalert2": "^11.10.8",
     "zustand": "^4.5.2"
   }
 }

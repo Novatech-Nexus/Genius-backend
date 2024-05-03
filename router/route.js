@@ -1,4 +1,8 @@
 import {Router} from 'express';
+import nodemailer from 'nodemailer';
+import Swal from 'sweetalert2';
+
+
 import Employee from '../model/employee.js'
 import Salary from '../model/salary.js';
 
@@ -116,11 +120,21 @@ router.route("/delete/:id").delete(async(req,res)=>{
 
 //reservation Management
 
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'restaurantgenius01@gmail.com',
+        pass: 'yvel ttwe eedv zuif'
+    }
+});
+
 router.route("/addtr").post(async (req, res) => {
     const {
         userName,
         contactNo,
         date,
+        email,
         time,
         category,
         tNumber,
@@ -136,6 +150,7 @@ router.route("/addtr").post(async (req, res) => {
         });
     
         if(existingReservation) {
+            
             return res.status(400).json({ message: 'This table is already booked for the selected date and time' });
         }
 
@@ -143,6 +158,7 @@ router.route("/addtr").post(async (req, res) => {
         userName,
         contactNo,
         date,
+        email,
         time,
         category,
         tNumber,
@@ -151,12 +167,31 @@ router.route("/addtr").post(async (req, res) => {
 
     
         await newReservation.save();
-        res.status(201).json("Reservation Added Successfully.");
-    }catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error adding reservation." });
-    }
-});
+        // Send reservation confirmation email
+        const mailOptions = {
+            from: 'sadaminiimalsha@gmail.com',
+            to: email,
+            subject: 'Reservation Confirmation',
+            text: `Dear ${userName},\n\n` +
+                `Your reservation details:\n` +
+                `Date: ${date}\n` +
+                `Time: ${time}\n` +
+                `Category: ${category}\n` +
+                `Table Number: ${tNumber}\n` +
+                `Number of Guests: ${nGuest}\n\n` +
+                `Thank you for your reservation!`
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.response);
+
+        // Respond with success message
+        res.status(201).json({ message: 'Reservation Added Successfully and Confirmation Email Sent.' });
+           }catch (err) {
+                console.error(err);
+                res.status(500).json({ error: "Error adding reservation." });
+            }
+        });
 
 
 // GET all reservations
@@ -171,6 +206,9 @@ router.route('/tr').get(async (req, res) => {
 });
 
 // UPDATE a reservation
+
+
+
 router.route('/updatetr/:id').put(async (req, res) => {
     const userId = req.params.id;
     const updateReservation = req.body;
@@ -188,6 +226,8 @@ router.route('/updatetr/:id').put(async (req, res) => {
 });
 
 // DELETE a reservation
+
+
 router.route('/deletetr/:id').delete(async (req, res) => {
     const userId = req.params.id;
 
