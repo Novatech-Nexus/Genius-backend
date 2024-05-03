@@ -27,11 +27,11 @@ router.route('/resetPassword').put(controller.resetPassword); // use to reset pa
 
 
 //catering managment
-router.route("/add").post(async(req,res)=>{
-
-    const { menuType, noOfPer, fName, lName, email, conNum1, conNum2, date, time, address } = req.body;
+router.post("/add", async (req, res) => {
+    const { functionType,menuType, noOfPer, fName, lName, email, conNum1, conNum2, date, time, address, perPersonPrice, totalPrice } = req.body;
 
     const newCorder = new CatOrdering({
+        functionType,
         menuType,
         noOfPer,
         fName,
@@ -41,50 +41,54 @@ router.route("/add").post(async(req,res)=>{
         conNum2,
         date,
         time,
-        address
+        address,
+        perPersonPrice,
+        totalPrice
     });
-
-    newCorder.save()
-        .then(() => {
-            res.json("Order Added Successfully.");
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(500).json({ error: "Error adding order." });
-        });
-})
-
-
-router.route("/").get(async (req, res) => {
-    
-    CatOrdering.find().then((CatOrder) => {
-        res.json(CatOrder);
-    }).catch((err) => {
-        console.log(err);
-    });
-
-});
-
-
-router.route("/update/:id").put(async(req,res)=>{
-    let userId = req.params.id;
-    const{menuType,noOfPer,fName,lName,email,conNum1,conNum2,date,time,address} = req.body;
-
-    const updateCOrder = {
-        menuType,
-        noOfPer,
-        fName,
-        lName,
-        email,
-        conNum1,
-        conNum2,
-        date,
-        time,
-        address
-    }
 
     try {
-        const updatedOrder = await CatOrdering.findByIdAndUpdate(userId, updateCOrder);
+        await newCorder.save();
+        res.json("Order Added Successfully.");
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Error adding order." });
+    }
+});
+
+// Get all orders
+router.get("/", async (req, res) => {
+    try {
+        const orders = await CatOrdering.find();
+        res.json(orders);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Error fetching orders." });
+    }
+});
+
+// Update order
+router.put("/update/:id", async (req, res) => {
+    const userId = req.params.id;
+    const { functionType, menuType, noOfPer, fName, lName, email, conNum1, conNum2, date, time, address, perPersonPrice, totalPrice } = req.body;
+
+    const updateCOrder = {
+        functionType,
+        menuType,
+        noOfPer,
+        fName,
+        lName,
+        email,
+        conNum1,
+        conNum2,
+        date,
+        time,
+        address,
+        perPersonPrice,
+        totalPrice
+    };
+
+    try {
+        const updatedOrder = await CatOrdering.findByIdAndUpdate(userId, updateCOrder, { new: true });
         if (!updatedOrder) {
             return res.status(404).send({ status: "Error with Updating Order", error: "Order not found" });
         }
@@ -95,17 +99,36 @@ router.route("/update/:id").put(async(req,res)=>{
     }
 });
 
+// Delete order
+router.delete("/delete/:id", async (req, res) => {
+    const userId = req.params.id;
 
-router.route("/delete/:id").delete(async(req,res)=>{
-    let userId = req.params.id;
-
-    await CatOrdering.findByIdAndDelete(userId).then(()=>{
-        res.status(200).send({status:"Oreder Deleted Succesfully"});
-    }).catch((err)=>{
+    try {
+        const deletedOrder = await CatOrdering.findByIdAndDelete(userId);
+        if (!deletedOrder) {
+            return res.status(404).send({ status: "Error with Deleting Order", error: "Order not found" });
+        }
+        res.status(200).send({ status: "Order Deleted Successfully" });
+    } catch (err) {
         console.log(err.message);
-        res.status(500).send({status:"Error with delete order",error:err.message});
-    })
-})
+        res.status(500).send({ status: "Error with Deleting Order", error: err.message });
+    }
+});
 
 
+// Route to get a catering item by ID
+router.get("/get/:id", async (req, res) => {
+    try {
+        const catget = await CatOrdering.findById(req.params.id);
+
+        if (!catget) {
+            return res.status(404).json({ error: "id not found" });
+        }
+
+        res.json(catget);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching catering order" });
+    }
+});
 export default router;
