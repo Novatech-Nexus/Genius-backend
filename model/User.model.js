@@ -25,5 +25,6 @@ export const UserSchema = new mongoose.Schema({
         required: [true, "Please provide a role"],
 
     }
+});
 
 export default mongoose.model.Users || mongoose.model('User', UserSchema)

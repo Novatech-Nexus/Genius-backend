@@ -6,6 +6,8 @@ import router from './router/route.js';
 import bodyParser from 'body-parser';
 
 
+import orderRoutes from './router/orderRoutes.js';
+import orderCartRoutes from './router/orderCartRoutes.js';
 
 const app= express();
 
@@ -33,6 +35,12 @@ app.use('/api', router);
 //catering
 app.use('/CatOrdering', router);
 
+//Reservation
+app.use('/Reservation', router);
+
+ //route Order-user details 
+ app.use('/api/orders', orderRoutes);
+ app.use('/api/orderCart', orderCartRoutes);
 
 //start server when we have a valid connection
 connect().then( () => {
@@ -46,4 +54,3 @@ connect().then( () => {
 }).catch(error => {
     console.log("Invalid database connection.");
 })
-
