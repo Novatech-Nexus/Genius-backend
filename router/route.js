@@ -19,12 +19,12 @@ router.route('/register').post(controller.register); // register user
 router.route('/registerMail').post(registerMail); // send the email
 router.route('/authenticate').post(controller.verifyUser, (req,res) => res.end()); // authenticate the user
 router.route('/login').post(controller.verifyUser, controller.login); // login in app
+router.route('/forgotPassword').post(controller.forgotPassword); // forgot password 01/05
+router.route('/getpassword').post(controller.getPassword); //
 
 // GET Methods
 router.route('/users').get(controller.getAllUsers); // get all users
 router.route('/user/:email').get(controller.getUser); // user with email
-router.route('/generateOTP').get(controller.verifyUser, localVariables, controller.generateOTP); //generate random OTP
-router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP); //verify generated OTP
 router.route('/createResetSession').get(controller.createResetSession); // reset all the variables
 
 // PUT Methods
