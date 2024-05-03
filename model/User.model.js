@@ -21,8 +21,10 @@ export const UserSchema = new mongoose.Schema({
         unique: false,
     },
     role: {
-        type :String
+        type: String,
+        required: [true, "Please provide a role"],
+
     }
-}) 
+});
 
 export default mongoose.model.Users || mongoose.model('User', UserSchema)
