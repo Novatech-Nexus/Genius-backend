@@ -14,7 +14,7 @@ const router = Router();
 import * as controller from '../controllers/appController.js';
 import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
-
+import { supplierMail } from '../controllers/suppliermail.js';
 import CatOrdering from '../model/CatOrdering.js';
 import Reservation from '../model/reservation.js'
 import Supplier from '../model/inventory_supplier.js';
@@ -602,7 +602,7 @@ router.route("/deleterecord/:id").delete(async(req,res)=>{
     let recordId = req.params.id;
     await Record.findByIdAndDelete(recordId)
     .then(()=>{
-        res.status(200).send({status:"User deleted"});
+        res.status(200).send({status:"record deleted"});
     }).catch((err)=>{
         console.log(err);
         res.status(500).send({status :"Error with delete data",error:err.message});
@@ -674,8 +674,9 @@ router.route("/deletesupplier/:id").delete(async(req,res)=>{
         res.status(500).send({status :"Error with delete data",error:err.message});
     })
 })
+router.route('/suppliermail').post(supplierMail) // send the email
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 export default router;
