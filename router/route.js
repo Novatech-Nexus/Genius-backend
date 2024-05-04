@@ -14,7 +14,7 @@ const router = Router();
 import * as controller from '../controllers/appController.js';
 import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
-
+import { supplierMail } from '../controllers/suppliermail.js';
 import CatOrdering from '../model/CatOrdering.js';
 import Reservation from '../model/reservation.js'
 import Supplier from '../model/inventory_supplier.js';
@@ -26,11 +26,11 @@ router.route('/authenticate').post(controller.verifyUser, (req,res) => res.end()
 router.route('/login').post(controller.verifyUser, controller.login); // login in app
 router.route('/forgotPassword').post(controller.forgotPassword); // forgot password 01/05
 router.route('/getpassword').post(controller.getPassword); //
+router.route('/empLogin').post(controller.verifyEmp, controller.empLogin); //login for employees
 
 // GET Methods
 router.route('/users').get(controller.getAllUsers); // get all users
 router.route('/user/:email').get(controller.getUser); // user with email
-router.route('/createResetSession').get(controller.createResetSession); // reset all the variables
 
 // PUT Methods
 router.route("/updateUser").put(Auth, controller.updateUser);
@@ -38,6 +38,7 @@ router.route('/resetPassword').put(controller.verifyUser, controller.resetPasswo
 
 // DELETE Methods
 router.route('/deleteUser').delete(Auth, controller.deleteUser); // delete user
+router.route('/deleteAnUser/:id').delete(controller.deleteAnuser); // delete user by id
 
 
 //catering managment
@@ -665,7 +666,7 @@ router.route("/deleterecord/:id").delete(async(req,res)=>{
     let recordId = req.params.id;
     await Record.findByIdAndDelete(recordId)
     .then(()=>{
-        res.status(200).send({status:"User deleted"});
+        res.status(200).send({status:"record deleted"});
     }).catch((err)=>{
         console.log(err);
         res.status(500).send({status :"Error with delete data",error:err.message});
@@ -737,8 +738,9 @@ router.route("/deletesupplier/:id").delete(async(req,res)=>{
         res.status(500).send({status :"Error with delete data",error:err.message});
     })
 })
+router.route('/suppliermail').post(supplierMail) // send the email
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 export default router;
