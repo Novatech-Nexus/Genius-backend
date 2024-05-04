@@ -16,7 +16,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 
 import CatOrdering from '../model/CatOrdering.js';
-import Reservation from '../model/reservation.js'
+// import Reservation from '../model/reservation.js';
 import Supplier from '../model/inventory_supplier.js';
 
 // POST methods
@@ -38,6 +38,7 @@ router.route('/resetPassword').put(controller.verifyUser, controller.resetPasswo
 
 // DELETE Methods
 router.route('/deleteUser').delete(Auth, controller.deleteUser); // delete user
+
 
 //catering managment
 router.route("/add").post(async(req,res)=>{
@@ -143,13 +144,13 @@ router.route("/addtr").post(async (req, res) => {
         nGuest
     } = req.body;
 
-//     try {
-//         const existingReservation = await Reservation.findOne({
-//             date,
-//             time,
-//             category,
-//             tNumber
-//         });
+    try {
+        const existingReservation = await Reservation.findOne({
+            date,
+            time,
+            category,
+            tNumber
+        });
     
         if(existingReservation) {
             
@@ -196,16 +197,16 @@ router.route("/addtr").post(async (req, res) => {
         });
 
 
-// // GET all reservations
-// router.route('/').get(async (req, res) => {
-//     try {
-//         const reservations = await Reservation.find();
-//         res.json(reservations);
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send({ status: 'Error', error: err.message });
-//     }
-// });
+// GET all reservations
+router.route('/tr').get(async (req, res) => {
+    try {
+        const reservations = await Reservation.find();
+        res.json(reservations);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
 
 // UPDATE a reservation
 
@@ -215,17 +216,17 @@ router.route('/updatetr/:id').put(async (req, res) => {
     const userId = req.params.id;
     const updateReservation = req.body;
 
-//     try {
-//         const updatedReservation = await Reservation.findByIdAndUpdate(userId, updateReservation, { new: true });
-//         if (!updatedReservation) {
-//             return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
-//         }
-//         res.status(200).send({ status: 'Reservation Updated Successfully', reservation: updatedReservation });
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send({ status: 'Error', error: err.message });
-//     }
-// });
+    try {
+        const updatedReservation = await Reservation.findByIdAndUpdate(userId, updateReservation, { new: true });
+        if (!updatedReservation) {
+            return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
+        }
+        res.status(200).send({ status: 'Reservation Updated Successfully', reservation: updatedReservation });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
 
 // DELETE a reservation
 
@@ -233,26 +234,26 @@ router.route('/updatetr/:id').put(async (req, res) => {
 router.route('/deletetr/:id').delete(async (req, res) => {
     const userId = req.params.id;
 
-//     try {
-//         const deletedReservation = await Reservation.findByIdAndDelete(userId);
-//         if (!deletedReservation) {
-//             return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
-//         }
-//         res.status(200).send({ status: 'Reservation Deleted Successfully' });
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send({ status: 'Error', error: err.message });
-//     }
-// });
+    try {
+        const deletedReservation = await Reservation.findByIdAndDelete(userId);
+        if (!deletedReservation) {
+            return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
+        }
+        res.status(200).send({ status: 'Reservation Deleted Successfully' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ status: 'Error', error: err.message });
+    }
+});
 
-// // Route to get a reservation  by ID
-// router.get("/get/:id", async (req, res) => {
-//     try {
-//         const reserve= await Reservation.findById(req.params.id);
+// Route to get a reservation  by ID
+router.get("/gettr/:id", async (req, res) => {
+    try {
+        const reserve= await Reservation.findById(req.params.id);
 
-//         if (!reserve) {
-//             return res.status(404).json({ error: "reservation not found" });
-//         }
+        if (!reserve) {
+            return res.status(404).json({ error: "reservation not found" });
+        }
 
         res.json(reserve);
     } catch (err) {
@@ -267,114 +268,6 @@ router.route('/deletetr/:id').delete(async (req, res) => {
 //test
 router.get("/test", (req, res) => res.send("Employee routes working"));
 
-router.post("/add", async (req, res) => {
-    try {
-        const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
-  
-        // Input validation
-        if (!employeeID || !nic) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
-  
-        const newEmployee = new Employee({
-            employeeID,
-            firstname,
-            lastname,
-            gender,
-            nic,
-            email,
-            jobtype,
-            mobile,
-            address,
-            city
-        });
-  
-        await newEmployee.save();
-        res.json({ message: "Employee added successfully" });
-    } catch (err) {
-        console.error(err);
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({ error: err.message });
-        }
-        res.status(500).json({ error: "Error adding employee" });
-      }
-  });
-
-
-router.route("/").get(async (req, res) => {
-  try {
-    const employees = await Employee.find();
-    res.json(employees);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error retrieving employees" });
-  }
-});
-
-router.get("/get/:id", async (req, res) => {
-  try {
-      const employee = await Employee.findById(req.params.id);
-
-      if (!employee) {
-          return res.status(404).json({ error: "Employee not found" });
-      }
-
-      res.json(employee);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Error fetching employee" });
-    }
-});
-
-
-
-router.put("/update/:id", async (req, res) => {
-  try {
-      const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
-
-      const updatedEmployee = {
-          employeeID,
-          firstname,
-          lastname,
-          gender,
-          nic,
-          email,
-          jobtype,
-          mobile,
-          address,
-          city
-      };
-
-      const updatedItem = await Employee.findByIdAndUpdate(req.params.id, updatedEmployee, { new: true });
-
-      if (!updatedItem) {
-          return res.status(404).json({ error: "Employee not found" });
-      }
-
-      res.json({ message: "Employee updated successfully" });
-  } catch (err) {
-      console.error(err);
-      if (err.name === 'ValidationError') {
-          return res.status(400).json({ error: err.message });
-      }
-      res.status(500).json({ error: "Error updating employee" });
-    }
-});
-
-router.delete("/delete/:id", async (req, res) => {
-  try {
-      const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
-
-      if (!deletedEmp) {
-          return res.status(404).json({ error: "emp not found" });
-      }
-
-      res.json({ message: "emp deleted successfully" });
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Error deleting emp" });
-    }
-});
 
 //staff salary routes
 router.post("/addsalary", async (req, res) => {
