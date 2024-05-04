@@ -8,7 +8,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 
 import CatOrdering from '../model/CatOrdering.js';
-import Reservation from '../model/reservation.js'
+// import Reservation from '../model/reservation.js'
 
 // POST methods
 router.route('/register').post(controller.register); // register user
