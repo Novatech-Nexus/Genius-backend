@@ -269,6 +269,114 @@ router.get("/gettr/:id", async (req, res) => {
 //test
 router.get("/test", (req, res) => res.send("Employee routes working"));
 
+router.post("/addemployee", async (req, res) => {
+    try {
+        const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+  
+        // Input validation
+        if (!employeeID || !nic) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+  
+        const newEmployee = new Employee({
+            employeeID,
+            firstname,
+            lastname,
+            gender,
+            nic,
+            email,
+            jobtype,
+            mobile,
+            address,
+            city
+        });
+  
+        await newEmployee.save();
+        res.json({ message: "Employee added successfully" });
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
+        res.status(500).json({ error: "Error adding employee" });
+      }
+  });
+
+
+router.route("/getemployee").get(async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error retrieving employees" });
+  }
+});
+
+router.get("/getemployee/:id", async (req, res) => {
+  try {
+      const employee = await Employee.findById(req.params.id);
+
+      if (!employee) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json(employee);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error fetching employee" });
+    }
+});
+
+
+
+router.put("/updateemployee/:id", async (req, res) => {
+  try {
+      const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+
+      const updatedEmployee = {
+          employeeID,
+          firstname,
+          lastname,
+          gender,
+          nic,
+          email,
+          jobtype,
+          mobile,
+          address,
+          city
+      };
+
+      const updatedItem = await Employee.findByIdAndUpdate(req.params.id, updatedEmployee, { new: true });
+
+      if (!updatedItem) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json({ message: "Employee updated successfully" });
+  } catch (err) {
+      console.error(err);
+      if (err.name === 'ValidationError') {
+          return res.status(400).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Error updating employee" });
+    }
+});
+
+router.delete("/deleteemployee/:id", async (req, res) => {
+  try {
+      const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
+
+      if (!deletedEmp) {
+          return res.status(404).json({ error: "emp not found" });
+      }
+
+      res.json({ message: "emp deleted successfully" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error deleting emp" });
+    }
+});
 
 //staff salary routes
 router.post("/addsalary", async (req, res) => {
