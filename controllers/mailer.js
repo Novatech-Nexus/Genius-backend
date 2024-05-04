@@ -3,8 +3,6 @@ import Mailgen from 'mailgen';
 import { config } from 'dotenv';
 
 config();
-
-// https://ethereal.email/create
 let nodeConfig = {
   service: "Gmail",
   auth: {
