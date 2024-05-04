@@ -1,4 +1,12 @@
 import {Router} from 'express';
+import nodemailer from 'nodemailer';
+import Swal from 'sweetalert2';
+
+
+import Employee from '../model/employee.js'
+import Salary from '../model/salary.js';
+import Item from '../model/inventory_item.js';
+import Record from '../model/inventory_records.js';
 
 const router = Router();
 
@@ -8,7 +16,8 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 
 import CatOrdering from '../model/CatOrdering.js';
-// import Reservation from '../model/reservation.js'
+import Reservation from '../model/reservation.js'
+import Supplier from '../model/inventory_supplier.js';
 
 // POST methods
 router.route('/register').post(controller.register); // register user
@@ -113,16 +122,26 @@ router.route("/delete/:id").delete(async(req,res)=>{
 
 //reservation Management
 
-// router.route("/add").post(async (req, res) => {
-//     const {
-//         userName,
-//         contactNo,
-//         date,
-//         time,
-//         category,
-//         tNumber,
-//         nGuest
-//     } = req.body;
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'restaurantgenius01@gmail.com',
+        pass: 'yvel ttwe eedv zuif'
+    }
+});
+
+router.route("/addtr").post(async (req, res) => {
+    const {
+        userName,
+        contactNo,
+        date,
+        email,
+        time,
+        category,
+        tNumber,
+        nGuest
+    } = req.body;
 
 //     try {
 //         const existingReservation = await Reservation.findOne({
@@ -132,28 +151,49 @@ router.route("/delete/:id").delete(async(req,res)=>{
 //             tNumber
 //         });
     
-//         if(existingReservation) {
-//             return res.status(400).json({ message: 'This table is already booked for the selected date and time' });
-//         }
+        if(existingReservation) {
+            
+            return res.status(400).json({ message: 'This table is already booked for the selected date and time' });
+        }
 
-//     const newReservation = new Reservation({
-//         userName,
-//         contactNo,
-//         date,
-//         time,
-//         category,
-//         tNumber,
-//         nGuest
-//     });
+    const newReservation = new Reservation({
+        userName,
+        contactNo,
+        date,
+        email,
+        time,
+        category,
+        tNumber,
+        nGuest
+    });
 
     
-//         await newReservation.save();
-//         res.status(201).json("Reservation Added Successfully.");
-//     }catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: "Error adding reservation." });
-//     }
-// });
+        await newReservation.save();
+        // Send reservation confirmation email
+        const mailOptions = {
+            from: 'sadaminiimalsha@gmail.com',
+            to: email,
+            subject: 'Reservation Confirmation',
+            text: `Dear ${userName},\n\n` +
+                `Your reservation details:\n` +
+                `Date: ${date}\n` +
+                `Time: ${time}\n` +
+                `Category: ${category}\n` +
+                `Table Number: ${tNumber}\n` +
+                `Number of Guests: ${nGuest}\n\n` +
+                `Thank you for your reservation!`
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.response);
+
+        // Respond with success message
+        res.status(201).json({ message: 'Reservation Added Successfully and Confirmation Email Sent.' });
+           }catch (err) {
+                console.error(err);
+                res.status(500).json({ error: "Error adding reservation." });
+            }
+        });
 
 
 // // GET all reservations
@@ -167,10 +207,13 @@ router.route("/delete/:id").delete(async(req,res)=>{
 //     }
 // });
 
-// // UPDATE a reservation
-// router.route('/update/:id').put(async (req, res) => {
-//     const userId = req.params.id;
-//     const updateReservation = req.body;
+// UPDATE a reservation
+
+
+
+router.route('/updatetr/:id').put(async (req, res) => {
+    const userId = req.params.id;
+    const updateReservation = req.body;
 
 //     try {
 //         const updatedReservation = await Reservation.findByIdAndUpdate(userId, updateReservation, { new: true });
@@ -184,9 +227,11 @@ router.route("/delete/:id").delete(async(req,res)=>{
 //     }
 // });
 
-// // DELETE a reservation
-// router.route('/delete/:id').delete(async (req, res) => {
-//     const userId = req.params.id;
+// DELETE a reservation
+
+
+router.route('/deletetr/:id').delete(async (req, res) => {
+    const userId = req.params.id;
 
 //     try {
 //         const deletedReservation = await Reservation.findByIdAndDelete(userId);
@@ -209,11 +254,427 @@ router.route("/delete/:id").delete(async(req,res)=>{
 //             return res.status(404).json({ error: "reservation not found" });
 //         }
 
-//         res.json(reserve);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: "Error fetching reservation" });
-//     }
-// });
+        res.json(reserve);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching reservation" });
+    }
+});
+
+
+
+//Staff management routes
+//test
+router.get("/test", (req, res) => res.send("Employee routes working"));
+
+router.post("/add", async (req, res) => {
+    try {
+        const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+  
+        // Input validation
+        if (!employeeID || !nic) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+  
+        const newEmployee = new Employee({
+            employeeID,
+            firstname,
+            lastname,
+            gender,
+            nic,
+            email,
+            jobtype,
+            mobile,
+            address,
+            city
+        });
+  
+        await newEmployee.save();
+        res.json({ message: "Employee added successfully" });
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
+        res.status(500).json({ error: "Error adding employee" });
+      }
+  });
+
+
+router.route("/").get(async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error retrieving employees" });
+  }
+});
+
+router.get("/get/:id", async (req, res) => {
+  try {
+      const employee = await Employee.findById(req.params.id);
+
+      if (!employee) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json(employee);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error fetching employee" });
+    }
+});
+
+
+
+router.put("/update/:id", async (req, res) => {
+  try {
+      const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
+
+      const updatedEmployee = {
+          employeeID,
+          firstname,
+          lastname,
+          gender,
+          nic,
+          email,
+          jobtype,
+          mobile,
+          address,
+          city
+      };
+
+      const updatedItem = await Employee.findByIdAndUpdate(req.params.id, updatedEmployee, { new: true });
+
+      if (!updatedItem) {
+          return res.status(404).json({ error: "Employee not found" });
+      }
+
+      res.json({ message: "Employee updated successfully" });
+  } catch (err) {
+      console.error(err);
+      if (err.name === 'ValidationError') {
+          return res.status(400).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Error updating employee" });
+    }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+  try {
+      const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
+
+      if (!deletedEmp) {
+          return res.status(404).json({ error: "emp not found" });
+      }
+
+      res.json({ message: "emp deleted successfully" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error deleting emp" });
+    }
+});
+
+//staff salary routes
+router.post("/addsalary", async (req, res) => {
+    try {
+        const { employeeID, name, basicamount, othours,amountperhour , month, amount } = req.body;
+
+        // Input validation
+        if (!employeeID || !name || !basicamount || !othours || !amountperhour || !month || !amount) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const newSalary = new Salary({
+            employeeID,
+            name,
+            basicamount,
+            othours,
+            amountperhour,
+            month,
+            amount
+        });
+
+        await newSalary.save();
+        res.json({ message: "Salary assigned successfully" });
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
+        res.status(500).json({ error: "Error assigning salary" });
+    }
+});
+router.route("/getsal").get(async (req, res) => {
+    try {
+      const salaries = await Salary.find();
+      res.json(salaries);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error retrieving employees" });
+    }
+  });
+
+  router.get("/getsalary/:id", async (req, res) => {
+    try {
+        const salary = await Salary.findById(req.params.id);
+  
+        if (!salary) {
+            return res.status(404).json({ error: "Salary details not found" });
+        }
+  
+        res.json(salary);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching details" });
+      }
+});
+router.put("/updatesal/:id", async (req, res) => {
+    try {
+        const { employeeID, name, basicamount, othours, amountperhour, month, amount } = req.body;
+
+        const updatedSalary = {
+            employeeID,
+            name,
+            basicamount,
+            othours,
+            amountperhour,
+            month,
+            amount
+        };
+
+        const updatedItem = await Salary.findByIdAndUpdate(req.params.id, updatedSalary, { new: true });
+
+        if (!updatedItem) {
+            return res.status(404).json({ error: "Salary details not found" });
+        }
+
+        res.json({ message: "Salary details updated successfully" });
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message });
+        }
+        res.status(500).json({ error: "Error updating salary details" });
+    }
+});
+
+
+  router.delete("/deletesalary/:id", async (req, res) => {
+    try {
+        const deletedSal = await Salary.findByIdAndDelete(req.params.id);
+  
+        if (!deletedSal) {
+            return res.status(404).json({ error: "employee name cannot not found" });
+        }
+  
+        res.json({ message: "salary details deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error deleting Salary details" });
+      }
+  });
+
+
+
+
+
+//inventory //////////////////////////////////////////////////////////////////////////////////////////////
+
+router.route("/addinventory").post((req,res)=>{
+    const code = req.body.inputCode;
+    const name = req.body.inputName;
+    const igroup = req.body.inputIgroup;
+    const quantity =req.body.inputQuentity;
+    const kg = req.body.inputKg;
+    const cost = req.body.inputCost;
+    const addDate = req.body.inputDate;
+    const discription = req.body.inputDiscription;
+
+    const newItem = new Item({
+        code,
+        name,
+        igroup,
+        quantity,
+        kg,
+        cost,
+        addDate,
+        discription
+    })
+    newItem.save().then(()=>{
+        res.json("New item added")
+    }).catch(((err)=>{
+        console.log(err);
+    }))
+
+})
+router.route("/getinventory").get((req,res)=>{
+    Item.find().then((item)=>{
+        res.json(item)
+    }).catch((err)=>{
+        console.log(err)
+    })
+})
+
+router.route("/updateinventory/:id").put(async(req,res)=>{
+    let itemId = req.params.id;
+    const {code,name,igroup,quantity,kg,cost,addDate} = req.body;
+    
+    const updateItem = {
+        code,
+        name,
+        igroup,
+        quantity,
+        kg,
+        cost,
+        addDate
+    }
+    const update = await Item.findByIdAndUpdate(itemId,updateItem)
+    .then(()=>{
+        res.status(200).send({status:"user updated"})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with updating data",error:err.message});
+    })
+
+})
+
+router.route("/deleteinventory/:id").delete(async(req,res)=>{
+    let itemId = req.params.id;
+    await Item.findByIdAndDelete(itemId)
+    .then(()=>{
+        res.status(200).send({status:"User deleted"});
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with delete data",error:err.message});
+    })
+})
+router.route("/getinventory/:id").get(async(req,res)=>{
+    let itemId = req.params.id;
+    const item =  await Item.findById(itemId)
+    .then((item)=>{
+        // res.status(200).send({status:"User fetched",item});
+        res.status(200).send(item);
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with fetched data",error:err.message});
+    })
+})
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+router.route("/addrecord").post((req,res)=>{
+    const recId = req.body.updateCode;
+    const recQuantity = req.body.Recordquantity;
+    const recKg = req.body.updateKg;
+    const recIn = req.body.isIncomeSelected;
+    const recOut = req.body.isOutgoingSelected;
+    const recCost = req.body.updateCost;
+    const recDate = req.body.newDate;
+
+    const newRecord = new Record({
+        recId,
+        recQuantity,
+        recKg,
+        recIn,
+        recOut,
+        recCost,
+        recDate
+    })
+    newRecord.save().then(()=>{
+        res.json("New record added")
+    }).catch(((err)=>{
+        console.log(err);
+    }))
+
+})
+
+router.route("/getrecord").get((req,res)=>{
+    Record.find().then((record)=>{
+        res.json(record)
+    }).catch((err)=>{
+        console.log(err)
+    })
+})
+router.route("/deleterecord/:id").delete(async(req,res)=>{
+    let recordId = req.params.id;
+    await Record.findByIdAndDelete(recordId)
+    .then(()=>{
+        res.status(200).send({status:"User deleted"});
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with delete data",error:err.message});
+    })
+})
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+router.route("/addsupplier").post((req,res)=>{
+    const suppID = req.body.inputId;
+    const suppName = req.body.inputName;
+    const suppEmail = req.body.inputEmail;
+    const suppPhone =  req.body.inputPhone;
+    const suppDisc = req.body.inputDisc;
+
+    const newSupplier = new Supplier({
+        suppID,suppName,suppEmail,suppPhone,suppDisc
+
+    })
+    newSupplier.save().then(()=>{
+        res.json("New item added")
+    }).catch(((err)=>{
+        console.log(err);
+    }))
+
+})
+router.route("/getsupplier").get((req,res)=>{
+    Supplier.find().then((supplier)=>{
+        res.json(supplier)
+    }).catch((err)=>{
+        console.log(err)
+    })
+})
+router.route("/updatesupplier/:id").put(async(req,res)=>{
+    let supplierID = req.params.id;
+    const {suppID,suppName,suppEmail,suppPhone,suppDisc} = req.body;
+    
+    const updateSupplier = {
+        suppID,suppName,suppEmail,suppPhone,suppDisc
+    }
+    const update = await Supplier.findByIdAndUpdate(supplierID,updateSupplier)
+    .then(()=>{
+        res.status(200).send({status:"user updated"})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with updating data",error:err.message});
+    })
+
+})
+router.route("/getsupplier/:id").get(async(req,res)=>{
+    let supplierId = req.params.id;
+    const supplier =  await Supplier.findById(supplierId)
+    .then((supplier)=>{
+        // res.status(200).send({status:"User fetched",item});
+        res.status(200).send(supplier);
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with fetched data",error:err.message});
+    })
+})
+
+router.route("/deletesupplier/:id").delete(async(req,res)=>{
+    let supplierId = req.params.id;
+    await Supplier.findByIdAndDelete(supplierId)
+    .then(()=>{
+        res.status(200).send({status:"User deleted"});
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({status :"Error with delete data",error:err.message});
+    })
+})
+
+
+
 
 export default router;
