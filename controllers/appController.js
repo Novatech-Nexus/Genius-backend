@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 import { otpGen } from "otp-gen-agent";
 
-config();
 
 /**Middleware for verify user*/
 export async function verifyUser(req, res, next) {
