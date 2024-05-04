@@ -25,6 +25,7 @@ export const UserSchema = new mongoose.Schema({
         required: [true, "Please provide a role"],
 
     }
+});
 
 })
 

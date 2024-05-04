@@ -6,6 +6,8 @@ import router from './router/route.js';
 import bodyParser from 'body-parser';
 
 
+import orderRoutes from './router/orderRoutes.js';
+import orderCartRoutes from './router/orderCartRoutes.js';
 
 const app= express();
 
@@ -25,7 +27,7 @@ const PORT =5050;
 app.get('/', (req, res) => {
     res.status(201).json("Home GET request");
 });
-
+ 
 // API routes
 app.use('/api', router);
 
@@ -33,6 +35,16 @@ app.use('/api', router);
 app.use("/inventoryItem",router);
 
 
+//Reservation
+app.use('/Reservation', router);
+
+ //route Order-user details 
+ app.use('/api/orders', orderRoutes);
+ app.use('/api/orderCart', orderCartRoutes);
+
+ //Employee
+ app.use("/employee", router);
+app.use("/salary",router);
 
 //start server when we have a valid connection
 connect().then( () => {
@@ -46,4 +58,3 @@ connect().then( () => {
 }).catch(error => {
     console.log("Invalid database connection.");
 })
-
