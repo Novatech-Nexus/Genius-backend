@@ -172,7 +172,7 @@ router.route("/addtr").post(async (req, res) => {
         await newReservation.save();
         // Send reservation confirmation email
         const mailOptions = {
-            from: 'sadaminiimalsha@gmail.com',
+            from: 'restaurantgenius01@gmail.com',
             to: email,
             subject: 'Reservation Confirmation',
             text: `Dear ${userName},\n\n` +
@@ -208,10 +208,30 @@ router.route('/tr').get(async (req, res) => {
     }
 });
 
+const reservationId = 'your_reservation_id_here'; // Replace this with the ID of the reservation you want to fetch
+
+// Make a GET request to fetch the reservation
+const fetchReservation = async () => {
+    try {
+      const response = await fetch(`/gettr/${reservationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch reservation');
+      }
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        setReservation(data);
+      } else {
+        throw new Error('Response is not valid JSON');
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+  
 
 
 // UPDATE a reservation
-
 
 
 router.route('/updatetr/:id').put(async (req, res) => {
@@ -220,33 +240,74 @@ router.route('/updatetr/:id').put(async (req, res) => {
 
     try {
         const updatedReservation = await Reservation.findByIdAndUpdate(userId, updateReservation, { new: true });
+        
         if (!updatedReservation) {
             return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
         }
+
+        
+
+        const mailOptions = {
+            from: 'restaurantgenius01@gmail.com',
+            to: updatedReservation.email, // Customer's email address
+            subject: 'Reservation Updated',
+            text: `Dear ${updatedReservation.userName},\n\n` +
+                  `Your reservation has been updated successfully:\n` +
+                  `New Date: ${updatedReservation.date}\n` +
+                  `New Time: ${updatedReservation.time}\n` +
+                  `New Category: ${updatedReservation.category}\n` +
+                  `New Table Number: ${updatedReservation.tNumber}\n` +
+                  `New Number of Guests: ${updatedReservation.nGuest}\n\n` +
+                  `Thank you for choosing our service!`
+        };
+
+        await transporter.sendMail(mailOptions);
+
         res.status(200).send({ status: 'Reservation Updated Successfully', reservation: updatedReservation });
     } catch (err) {
-        console.log(err);
+        console.error('Error updating reservation:', err);
         res.status(500).send({ status: 'Error', error: err.message });
     }
 });
+
 
 // DELETE a reservation
 
 
-router.route('/deletetr/:id').delete(async (req, res) => {
-    const userId = req.params.id;
-
+router.delete('/deletetr/:id', async (req, res) => {
+    const { id } = req.params;
+  
     try {
-        const deletedReservation = await Reservation.findByIdAndDelete(userId);
-        if (!deletedReservation) {
-            return res.status(404).send({ status: 'Error', error: 'Reservation not found' });
-        }
-        res.status(200).send({ status: 'Reservation Deleted Successfully' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ status: 'Error', error: err.message });
+      const deletedReservation = await Reservation.findByIdAndDelete(id);
+  
+      if (!deletedReservation) {
+        return res.status(404).json({ error: 'Reservation not found' });
+      }
+  
+      // Send reservation deletion email notification
+      const mailOptions = {
+        from: 'restaurantgenius01@gmail.com',
+        to: deletedReservation.email,
+        subject: 'Reservation Deleted',
+        text: `Dear ${deletedReservation.userName},\n\n` +
+              `Your reservation with Name ${deletedReservation.userName}\n` + // Fixed concatenation here
+              `Date: ${deletedReservation.date}\n` +
+              `Time: ${deletedReservation.time}\n` +
+              `Category: ${deletedReservation.category}\n` +
+              `Table Number: ${deletedReservation.tNumber}\n` +
+              `Number of Guests: ${deletedReservation.nGuest}\n\n` +
+              `has been successfully deleted.\n\n` +
+              `Thank you for choosing our service!`
+      };
+  
+      await transporter.sendMail(mailOptions);
+  
+      res.status(200).json({ message: 'Reservation deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting reservation:', error);
+      res.status(500).json({ error: 'Error deleting reservation' });
     }
-});
+  });
 
 // Route to get a reservation  by ID
 router.get("/gettr/:id", async (req, res) => {
