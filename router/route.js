@@ -16,7 +16,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 import { supplierMail } from '../controllers/suppliermail.js';
 import CatOrdering from '../model/CatOrdering.js';
-import Reservation from '../model/reservation.js'
+// import Reservation from '../model/reservation.js';
 import Supplier from '../model/inventory_supplier.js';
 
 // POST methods
@@ -26,11 +26,11 @@ router.route('/authenticate').post(controller.verifyUser, (req,res) => res.end()
 router.route('/login').post(controller.verifyUser, controller.login); // login in app
 router.route('/forgotPassword').post(controller.forgotPassword); // forgot password 01/05
 router.route('/getpassword').post(controller.getPassword); //
+router.route('/empLogin').post(controller.verifyEmp, controller.empLogin); //login for employees
 
 // GET Methods
 router.route('/users').get(controller.getAllUsers); // get all users
 router.route('/user/:email').get(controller.getUser); // user with email
-router.route('/createResetSession').get(controller.createResetSession); // reset all the variables
 
 // PUT Methods
 router.route("/updateUser").put(Auth, controller.updateUser);
@@ -38,6 +38,7 @@ router.route('/resetPassword').put(controller.verifyUser, controller.resetPasswo
 
 // DELETE Methods
 router.route('/deleteUser').delete(Auth, controller.deleteUser); // delete user
+router.route('/deleteAnUser/:id').delete(controller.deleteAnuser); // delete user by id
 
 
 //catering managment
@@ -268,7 +269,7 @@ router.get("/gettr/:id", async (req, res) => {
 //test
 router.get("/test", (req, res) => res.send("Employee routes working"));
 
-router.post("/add", async (req, res) => {
+router.post("/addemployee", async (req, res) => {
     try {
         const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
   
@@ -302,7 +303,7 @@ router.post("/add", async (req, res) => {
   });
 
 
-router.route("/").get(async (req, res) => {
+router.route("/getemployee").get(async (req, res) => {
   try {
     const employees = await Employee.find();
     res.json(employees);
@@ -312,7 +313,7 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.get("/get/:id", async (req, res) => {
+router.get("/getemployee/:id", async (req, res) => {
   try {
       const employee = await Employee.findById(req.params.id);
 
@@ -329,7 +330,7 @@ router.get("/get/:id", async (req, res) => {
 
 
 
-router.put("/update/:id", async (req, res) => {
+router.put("/updateemployee/:id", async (req, res) => {
   try {
       const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
 
@@ -362,7 +363,7 @@ router.put("/update/:id", async (req, res) => {
     }
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/deleteemployee/:id", async (req, res) => {
   try {
       const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
 

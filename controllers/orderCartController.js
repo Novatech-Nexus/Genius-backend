@@ -18,4 +18,28 @@ export const addOrderCart = async (req, res, next) => {
   }
 };
 
+export const getOrderCart = async (req, res, next) => {
+  try {
+    const orderCarts = await OrderCart.find();
+    res.json(orderCarts);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrderCartById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const orderCart = await OrderCart.findById(id);
+    
+    if (!orderCart) {
+      return res.status(404).json({ error: "Order cart item not found" });
+    }
+    
+    res.json(orderCart);
+  } catch (error) {
+    next(error);
+  }
+};
+
 
