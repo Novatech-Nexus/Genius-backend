@@ -23,21 +23,21 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 
-const PORT = process.env.PORT || 5050;
+const PORT =5050;
 
 //HTTP GET request
 app.get('/', (req, res) => {
     res.status(201).json("Home GET request");
 });
-
+ 
 // API routes
 app.use('/api', router);
 
+//inventory==========================
+app.use("/inventoryItem",router);
  //route Feedback 
 app.use("/api/feedback",feedbackRouter);
 
-//catering
-app.use('/CatOrdering', router);
 
 //Reservation
 app.use('/Reservation', router);
@@ -45,6 +45,10 @@ app.use('/Reservation', router);
  //route Order-user details 
  app.use('/api/orders', orderRoutes);
  app.use('/api/orderCart', orderCartRoutes);
+
+ //Employee
+ app.use("/employee", router);
+app.use("/salary",router);
 
  //route contact
 app.use("/api/contact",contactRouter);
