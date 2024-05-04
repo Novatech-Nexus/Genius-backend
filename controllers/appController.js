@@ -62,6 +62,7 @@ export async function register(req, res) {
 export async function login(req, res) {
   const { email, password } = req.body;
 
+  console.log("Login function started");
   try {
     const user = await UserModel.findOne({ email });
 
@@ -72,10 +73,10 @@ export async function login(req, res) {
 
     // Create JWT token
     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "24h" });
-    console.log(user);
     return res.status(200).send({ msg: "Login successful", email: user.email, token, id: user._id});
   } catch (error) {
-    return res.status(500).send({ error });
+    console.log("Catch error occured");
+    return res.status(500).send(error);
   }
 }
 
@@ -200,33 +201,120 @@ export async function createResetSession(req, res){
 }
 
 //Reset password function
+// export async function resetPassword(req, res) {
+//   try {
+
+//     if(!res.app.locals.resetSession){
+//       return res.status(440).send({ error : "Session expired" })
+//     }
+
+//     const { email, password } = req.body;
+
+//     const user = await UserModel.findOne({ email });
+//     if (!user) {
+//       return res.status(404).send({ error: "Email not found" });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const updateResult = await UserModel.updateOne(
+//       { email: user.email },
+//       { password: hashedPassword }
+//     );
+
+//     if (updateResult.nModified == 0) {
+//       throw new Error("No document matches the provided query.");
+//     }
+
+//     return res.status(201).send({ msg: "Record updated" });
+
+//   } catch (error) {
+//     return res.status(500).send({ error: error.message });
+//   }
+// }
+
+
+
+//Forgot password function
+export async function forgotPassword(req, res) {
+  const { email } = req.body;
+
+  try {
+    const findUser = await UserModel.findOne({ email });
+
+    if(!findUser){
+      return res.status(404).send({ error : "Email not found" });
+    }
+
+    const secret = process.env.JWT_SECRET + findUser.password;
+    const token = jwt.sign({ email: findUser.email, id: findUser._id }, secret, { expiresIn: "15m" });
+
+    const link = 'http://localhost:5050/reset-password/${findUser._id}/${token}';
+    console.log(link);
+  } catch (error) {
+    
+  }
+}
+
+//Reset password function
 export async function resetPassword(req, res) {
+
+  const { email, password, newPassword } = req.body;
+  console.log("finding user");
+
+  const user = await UserModel.findOne({ email });
+
+  console.log(user);
+  if (!user) return res.status(404).send({ error: "Email not found" });
+
+  if (!password == user.password) return res.status(400).send({ error: "Password incorrect" });
+  console.log(password);
+  console.log(user.password);
+
+  // Hash password securely with appropriate work factor
+  const saltRounds = 10; // Adjust based on security needs
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
   try {
 
-    if(!res.app.locals.resetSession){
-      return res.status(440).send({ error : "Session expired" })
-    }
-
-    const { email, password } = req.body;
-
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(404).send({ error: "Email not found" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const updateResult = await UserModel.updateOne(
-      { email: user.email },
-      { password: hashedPassword }
+    console.log("updating user");
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { email: req.body.email },
+      { password: hashedPassword },
+      {
+        new: true,
+      }
     );
-
-    if (updateResult.nModified == 0) {
-      throw new Error("No document matches the provided query.");
+    
+    console.log(updatedUser);
+  
+    if (!updatedUser) {
+      return res.status(404).send({ error: "User not found" });
+    } else {
+      return res.status(200).send({ msg: "Password reset successfully" });
     }
-
-    return res.status(201).send({ msg: "Record updated" });
-
   } catch (error) {
-    return res.status(500).send({ error: error.message });
+    return res
+    .status(500)
+    .send({ error: error.message || "Internal server error" });
   }
+
+}
+
+
+//getPassword controller
+export async function getPassword(req, res){
+  const { email } = req.body;
+
+  const user = await UserModel.findOne({email});
+
+  if(!email){
+    return res.status(400).send({ error: "Email not found" });
+  }
+
+if(user){
+  return res.status(200).send({ password: user.password });
+}
+else{
+  return res.status(404).send({ error: "User not found" });
+}
 }
