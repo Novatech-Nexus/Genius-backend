@@ -8,6 +8,9 @@ import bodyParser from 'body-parser';
 
 import orderRoutes from './router/orderRoutes.js';
 import orderCartRoutes from './router/orderCartRoutes.js';
+import menuRouter from './router/menuRouter.js'
+import CatOrdering from './model/CatOrdering.js';
+
 
 const app= express();
 
@@ -33,6 +36,8 @@ app.use('/api', router);
 
 //inventory==========================
 app.use("/inventoryItem",router);
+// Mount the menuRouter at the '/item' endpoint
+app.use("/item", menuRouter);
 
 
 //Reservation
@@ -43,8 +48,11 @@ app.use('/Reservation', router);
  app.use('/api/orderCart', orderCartRoutes);
 
  //Employee
- app.use("/employee", router);
+app.use("/employee", router);
 app.use("/salary",router);
+
+//CatOrdering
+app.use('/CatOrdering', router);
 
 //start server when we have a valid connection
 connect().then( () => {

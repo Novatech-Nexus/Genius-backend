@@ -16,7 +16,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 import { supplierMail } from '../controllers/suppliermail.js';
 import CatOrdering from '../model/CatOrdering.js';
-import Reservation from '../model/reservation.js'
+// import Reservation from '../model/reservation.js';
 import Supplier from '../model/inventory_supplier.js';
 
 // POST methods
@@ -269,7 +269,7 @@ router.get("/gettr/:id", async (req, res) => {
 //test
 router.get("/test", (req, res) => res.send("Employee routes working"));
 
-router.post("/add", async (req, res) => {
+router.post("/addemployee", async (req, res) => {
     try {
         const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
   
@@ -303,7 +303,7 @@ router.post("/add", async (req, res) => {
   });
 
 
-router.route("/").get(async (req, res) => {
+router.route("/getemployee").get(async (req, res) => {
   try {
     const employees = await Employee.find();
     res.json(employees);
@@ -313,7 +313,7 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.get("/get/:id", async (req, res) => {
+router.get("/getemployee/:id", async (req, res) => {
   try {
       const employee = await Employee.findById(req.params.id);
 
@@ -330,7 +330,7 @@ router.get("/get/:id", async (req, res) => {
 
 
 
-router.put("/update/:id", async (req, res) => {
+router.put("/updateemployee/:id", async (req, res) => {
   try {
       const { employeeID, firstname, lastname, gender, nic, email, jobtype, mobile, address, city } = req.body;
 
@@ -363,7 +363,7 @@ router.put("/update/:id", async (req, res) => {
     }
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/deleteemployee/:id", async (req, res) => {
   try {
       const deletedEmp = await Employee.findByIdAndDelete(req.params.id);
 
