@@ -9,6 +9,7 @@ const itemSchema = new Schema({
     quantity: { type: Number },
     kg: { type: String },
     cost: { type: Number },
+    addDate : {type:Date,required: true},
     discription : { type: String}
 });
 

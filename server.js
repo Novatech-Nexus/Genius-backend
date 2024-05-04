@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 
-const PORT = 5050;
+const PORT =5050;
 
 //HTTP GET request
 app.get('/', (req, res) => {
@@ -28,6 +28,9 @@ app.get('/', (req, res) => {
 
 // API routes
 app.use('/api', router);
+
+//inventory==========================
+app.use("/inventoryItem",router);
 
 
 
