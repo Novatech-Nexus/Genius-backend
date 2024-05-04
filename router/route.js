@@ -16,7 +16,7 @@ import {registerMail} from '../controllers/mailer.js';
 import Auth, {localVariables} from '../middleware/auth.js';
 import { supplierMail } from '../controllers/suppliermail.js';
 import CatOrdering from '../model/CatOrdering.js';
-import Reservation from '../model/reservation.js'
+// import Reservation from '../model/reservation.js';
 import Supplier from '../model/inventory_supplier.js';
 
 // POST methods
