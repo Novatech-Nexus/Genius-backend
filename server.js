@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 import orderRoutes from './router/orderRoutes.js';
 import orderCartRoutes from './router/orderCartRoutes.js';
 
+
 const app= express();
 
 // middlewares
@@ -38,6 +39,7 @@ app.use('/CatOrdering', router);
  //route Order-user details 
  app.use('/api/orders', orderRoutes);
  app.use('/api/orderCart', orderCartRoutes);
+
 
 //start server when we have a valid connection
 connect().then( () => {
