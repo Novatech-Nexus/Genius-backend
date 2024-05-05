@@ -8,6 +8,9 @@ import bodyParser from 'body-parser';
 
 import orderRoutes from './router/orderRoutes.js';
 import orderCartRoutes from './router/orderCartRoutes.js';
+import menuRouter from './router/menuRouter.js'
+import CatOrdering from './model/CatOrdering.js';
+
 import feedbackRouter from './router/feedback.route.js';
 import contactRouter from './router/contact.route.js';
 
@@ -35,6 +38,8 @@ app.use('/api', router);
 
 //inventory==========================
 app.use("/inventoryItem",router);
+// Mount the menuRouter at the '/item' endpoint
+app.use("/item", menuRouter);
  //route Feedback 
 app.use("/api/feedback",feedbackRouter);
 
@@ -47,8 +52,11 @@ app.use('/Reservation', router);
  app.use('/api/orderCart', orderCartRoutes);
 
  //Employee
- app.use("/employee", router);
+app.use("/employee", router);
 app.use("/salary",router);
+
+//CatOrdering
+app.use('/CatOrdering', router);
 
  //route contact
 app.use("/api/contact",contactRouter);

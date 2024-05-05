@@ -35,7 +35,7 @@ export const supplierMail = async (req, res) => {
         body: {
             name: email,
             intro: 'Welcome to Genius Restaurant!',
-            outro: `Dear Supplier,Our inventory levels are dwindling fast!🚨  We need your help to restock urgently.Certain items are running dangerously low, which could impact our ability to fulfill orders and meet customer expectations. Your swift action in replenishing these items is crucial.`
+            outro: `Dear Supplier,Our inventory levels are dwindling fast!🚨  We need your help to restock urgently.Certain items are running low.`
         } 
     }
 

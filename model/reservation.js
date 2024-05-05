@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
-const { Schema } = mongoose;
+// const { Schema } = mongoose;
 
 const categoryTNumberMap ={
     'Couple': ['C1', 'C2', 'C3','C4', 'C5' , 'C6', 'C7', 'C8','C9' ,'C10'],
@@ -63,4 +63,4 @@ const reservationSchema = new Schema({
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
-export default Reservation;
+// export default Reservation;
