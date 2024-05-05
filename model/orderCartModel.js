@@ -9,8 +9,8 @@ const cartItemSchema = new mongoose.Schema({
 
 const orderCartSchema = new mongoose.Schema({
   items: [cartItemSchema], // Array of cart items
-  netTotal: { type: Number, required: true } // Total price of all items
-  // You can add other fields as needed
+  netTotal: { type: Number, required: true }, // Total price of all items
+  createdAt: { type: Date, default: Date.now } // Date and time of creation (auto-generated)
 });
 
 

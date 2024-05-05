@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
-const { Schema } = mongoose;
+// const { Schema } = mongoose;
 
 const categoryTNumberMap ={
-    'Couple': ['C1', 'C2', 'C3','C4', 'C5' , 'C6', 'C7', 'C8'],
-    'Family/Friends': ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8'],
+    'Couple': ['C1', 'C2', 'C3','C4', 'C5' , 'C6', 'C7', 'C8','C9' ,'C10'],
+    'Family/Friends': ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8','F9' , 'F10'],
     'Business Meeting': ['B1', 'B2', 'B3', 'B4', 'B5'] 
 }
 
@@ -18,10 +18,15 @@ const reservationSchema = new Schema({
         required: true
     },
 
+    email: {
+        type: String,
+        required: true
+    },
     date: {
         type: String,
         required: true
     },
+    
     time: {
         type: String,
         required: true,
@@ -58,4 +63,4 @@ const reservationSchema = new Schema({
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
-export default Reservation;
+// export default Reservation;
