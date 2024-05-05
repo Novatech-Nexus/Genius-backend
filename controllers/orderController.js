@@ -18,15 +18,28 @@ export const addOrder = async (req, res, next) => {
 };
 
 // Get all order
-export const getOrder = async (req, res, next) => {
+export const getOrderInfo = async (req, res, next) => {
     try {
       // Fetching all order data
-      const orderData = await Order.find();
-      res.status(200).json(orderData);  // Sending order data as response
+      const orderInfo = await Order.find();
+      res.status(200).json(orderInfo);  // Sending order data as response
     } catch (error) {
       next(error);
     }
   };
+
+export const getOrder = async (req, res, next) => {
+    try {
+        // Fetch the most recent order (latest entry)
+        const orderData = await Order.findOne().sort({ _id: -1 });
+        if (!orderData) {
+            return res.status(404).json({ success: false, message: 'No order found.' });
+        }
+        res.status(200).json(orderData);
+    } catch (error) {
+        next(error);
+    }
+};
 
 // Delete order by ID
 export const deleteOrder = async (req, res, next) => {
