@@ -3,6 +3,8 @@ import Mailgen from 'mailgen';
 import { config } from 'dotenv';
 
 config();
+
+// https://ethereal.email/create
 let nodeConfig = {
   service: "Gmail",
   auth: {
@@ -21,34 +23,29 @@ let MailGenerator = new Mailgen({
     }
 })
 
-/** POST: http://localhost:8080/api/registerMail 
- * @param: {
- *  "email": "",
- *  "text": "",
- *  "subject": ""
- * }
-*/
+
 
 //controller
-export const registerMail = async (req, res) => {
-    const { userEmail, text, subject } = req.body;
+export const supplierMail = async (req, res) => {
+    const { email } = req.body;
+    console.log("Request Body:", req.body);
 
     //body of the email
     var Email = {
         body: {
-            name: userEmail,
-            intro: 'Welcome to Genius Restaurant! We are very excited to have you on board.',
-            outro: `<a href="${text}">To recover your account please click here. </a>`
+            name: email,
+            intro: 'Welcome to Genius Restaurant!',
+            outro: `Dear Supplier,Our inventory levels are dwindling fast!🚨  We need your help to restock urgently.Certain items are running low.`
         } 
     }
 
     //Pass the email to the MailGenerator
+   
     var emailBody = MailGenerator.generate(Email);
-    
     let message = {
         from : process.env.EMAIL,
-        to : userEmail,
-        subject : subject || "Welcome to Genius Restaurant",
+        to : email,
+        subject :"Welcome to Genius Restaurant",
         html : emailBody
     }
 
