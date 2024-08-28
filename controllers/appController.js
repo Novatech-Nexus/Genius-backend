@@ -199,33 +199,6 @@ export async function getAllUsers(req, res) {
   }
 }
 
-//Generate OTP function
-// export async function generateOTP(req, res){
-//     req.app.locals.OTP = await otpGen();
-//     res.status(201).send({ code : req.app.locals.OTP });
-//   }
-
-//Verify OTP function
-// export async function verifyOTP(req, res){
-//     const { code } = req.query;
-//     if(parseInt(req.app.locals.OTP) === parseInt(code)){
-//       req.app.locals.OTP = null;  //reset the OTP value
-//       req.app.locals.resetSession = true;  //start the session for reset password
-//       return res.status(201).send({ msg : "Verify Succesfully" });
-//     }
-//     else{
-//       return res.status(400).send({ error : "Invalid OTP" });
-//     }
-// }
-
-//Reset session function
-// export async function createResetSession(req, res){
-//     if(req.app.locals.resetSession){
-//       return res.status(201).send({ flag: req.app.locals.resetSession })
-//     }
-//     return res.status(440).send({ error : "Session expired" })
-// }
-
 //Forgot password function
 export async function forgotPassword(req, res) {
   const { email } = req.body;
