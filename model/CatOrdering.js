@@ -3,48 +3,62 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const catOrderingSchema = new Schema({
-    menuType: {
-        type: String,
-        required: true
-    },
-    noOfPer: {
+      functionType:{
+        type: String, 
+        required: false
+      },  
+      menuType: {
+        type: [String], 
+        required: false
+      },
+      noOfPer: { 
         type: Number,
-        required: true
-    },
-    fName: {
+        required: false,
+        min: 25,
+        max: 1000
+      },
+      fName: {
         type: String,
-        required: true
-    },
-    lName: {
+        required: false
+      },
+      lName: {
         type: String,
-        required: true
-    },
-    email: {
+        required: false
+      },
+      email: {
         type: String,
-        required: true
-    },
-    conNum1: {
+        required: false
+      },
+      conNum1: {
         type: Number,
-        required: true
-    },
-    conNum2: {
+        required: false
+      },
+      conNum2: {
         type: Number,
-        required: true
-    },
-    date: {
+        required: false
+      },
+      date: {
+        type: Date,
+        required: false
+      },
+      time: {
         type: String,
-        required: true
-    },
-    time: {
+        required: false
+      },
+      address: {
         type: String,
-        required: true
-    },
-    address: {
-        type: String,
-        required: true
-    }
-});
-
+        required: false
+      },
+      perPersonPrice:{
+        type: Number,
+        required: false
+      },
+      totalPrice:{
+        type: Number,
+        required: false
+      }
+    });
+    
 const CatOrdering = mongoose.model("CatOrdering", catOrderingSchema);
 
 export default CatOrdering;
